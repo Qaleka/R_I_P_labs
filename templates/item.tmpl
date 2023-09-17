@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Подробная информация</title>
+</head>
+<body>
+    <h1>Подробная информация</h1>
+    <img class="card-img-top" src="{{.Recipients.ImageSrc}}" alt="Card image cap">
+    <p>ID: {{.Recipients.Id}}</p>
+    <p>Фио: {{.Recipients.Name.First_name}} {{.Recipients.Name.Second_name}} {{.Recipients.Name.Third_name}}</p>
+    <p>Email: {{.Recipients.Email}}</p>
+    <p>Возраст: {{.Recipients.Age}}</p>
+    <p>Адрес: {{.Recipients.Adress}}</p>
+</body>
+</html>

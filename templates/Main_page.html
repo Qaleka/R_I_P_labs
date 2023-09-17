@@ -3,14 +3,23 @@
 <head>
 </head>
 <body>
-
-<div class = "card">
-    <img src = "resources/man1.png" alt = "Avatar" style = "width: 100%;">
-    <div class = "container">
-        <h4><b>HTML CSS</b></h4>
-        <p>Architect & Engineer</p>
-    </div> 
-</div>
-
+    <h1>Список получателей</h1>
+    <ul>
+        {{range $key, $value := .}}
+            <li>
+                <a href="http://localhost:8080/recipients/{{$value.Id}}" class="btn btn-primary">
+                    <div class="card">
+                        <img class="card-img-top" src={{$value.ImageSrc}} alt="Card image cap">
+                        <div class="card-body">
+                            <h5 class="card-text">№{{$value.Id}}</h5>
+                            <p class="card-text">{{$value.Name.First_name}} {{$value.Name.Second_name}}</p>
+                            <h5 class="card-title">Почта:</h5>
+                            <p class="card-text">{{$value.Email}}</p>
+                        </div>
+                    </div>
+                </a>
+            </li>
+        {{end}}
+    </ul>
 </body>
 </html>
