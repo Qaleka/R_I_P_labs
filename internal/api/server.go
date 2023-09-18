@@ -79,7 +79,7 @@ func StartServer() {
 	})
 
 	r.Static("/image", "/resources/index.css")
-
+	r.Static("/styles", ".templates/product_card.css")
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 
 	log.Println("Server down")
