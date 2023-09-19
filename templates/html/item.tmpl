@@ -2,14 +2,17 @@
 <html>
 <head>
     <title>Подробная информация</title>
+    <link href="/css/product_card.css" rel="stylesheet" type="text/css">
 </head>
 <body>
+    <div class = "card">
     <h1>Подробная информация</h1>
     <img class="card-img-top" src="{{.Recipients.ImageSrc}}" alt="Card image cap">
-    <p>ID: {{.Recipients.Id}}</p>
+    <p>Идентификационный номер: {{.Recipients.Id}}</p>
     <p>Фио: {{.Recipients.Name.First_name}} {{.Recipients.Name.Second_name}} {{.Recipients.Name.Third_name}}</p>
     <p>Email: {{.Recipients.Email}}</p>
     <p>Возраст: {{.Recipients.Age}}</p>
     <p>Адрес: {{.Recipients.Adress}}</p>
+    </div>
 </body>
 </html>

@@ -15,14 +15,20 @@
     <button type="submit">Фильтровать</button>
     </form>
     <!-- Список услуг в виде карточек -->
+    <div class = "cards">
     {{range .Recipients}}
         <div class="card">
             <h2>{{.Name.First_name}}</h2>
-            <p>Email: {{.Email}}</p>
+            <p>
+            <div class = "card_title">
+            Email: {{.Email}}
+            </div>
+            </p>
             <p>Возраст: {{.Age}}</p>
             <img class="card-img-top" src={{.ImageSrc}} alt="Card image cap">
-            <a href="/recipients/{{.Id}}">Подробнее</a>
+            <a href="/recipients/{{.Id}}" class = "card_add">Подробнее</a>
         </div>
     {{end}}
+    </div>
 </body>
 </html>
