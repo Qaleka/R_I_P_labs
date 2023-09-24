@@ -10,6 +10,7 @@ article {
   transform-origin: center;
   transition: all 0.4s ease-in-out;
   overflow: hidden;
+  background-image: linear-gradient( to right, #48e6f1,#ffe6e6);
 }
 
 article a::after {
@@ -107,15 +108,6 @@ body {
   gap: 24px;
 }
 
-.article-item {
-  display: grid;
-  max-width: 1200px;
-  margin-inline: auto;
-  padding-inline: 24px;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
-  transform-origin: center;
-}
 
 @media screen and (max-width: 960px) {
   article {
