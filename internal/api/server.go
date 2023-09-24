@@ -39,6 +39,18 @@ func StartServer() {
 			Age:      31,
 			Adress:   "Москва, ул. Тверская, д.25, кв.145",
 		},
+		{
+			Id: 2,
+			Name: models.FIO{
+				First_name:  "Александр",
+				Second_name: "Лейко",
+				Third_name:  "Кириллович",
+			},
+			ImageSrc: "https://plushdermalaser.com/wp-content/uploads/2019/02/scar-reduction-square.jpg",
+			Email:    "Alek221@mail.ru",
+			Age:      37,
+			Adress:   "Москва, ул. Изюмская, д.15, кв.89",
+		},
 	}
 
 	// r.GET("/recipients", func(c *gin.Context) {

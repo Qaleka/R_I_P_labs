@@ -1,20 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" >
 <head>
-    <title>Подробная информация</title>
-    <link href="/css/product_card.css" rel="stylesheet" type="text/css">
+  <meta charset="UTF-8">
+  <link href="/css/item.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-    <h1 style = "text-align:center">Подробная информация</h1>
-    <div class = "card_item">
-    <div class = "card_item_data">
-    <div>Идентификационный номер: {{.Recipients.Id}}</div>
-    <div>Фио: {{.Recipients.Name.First_name}} {{.Recipients.Name.Second_name}} {{.Recipients.Name.Third_name}}</div>
-    <div>Email: {{.Recipients.Email}}</div>
-    <div>Возраст: {{.Recipients.Age}}</div>
-    <div>Адрес: {{.Recipients.Adress}}</div>
+  <h1 style = "text-align:center">Подробная информация</h1>
+<p>
+<div>
+<section class="articles">
+  <article>
+    <div class="article-wrapper">
+        <img src="{{.Recipients.ImageSrc}}" alt="" />
+      <div class="article-body">
+        <h2>{{.Recipients.Name.First_name}} {{.Recipients.Name.Second_name}} {{.Recipients.Name.Third_name}}</h2>
+        <div>
+          <b>Почта:</b>  {{.Recipients.Email}}
+        </div>
+        <div>
+          <b>Возраст:</b>  {{.Recipients.Age}}
+        </div>
+        <div>
+          <b>Адрес:</b>  {{.Recipients.Adress}}
+        </div>
+        <div>
+          <b>Возраст:</b>  {{.Recipients.Age}}
+        </div>
+      </div>
     </div>
-    <img class="card-img-top" src="{{.Recipients.ImageSrc}}" alt="Card image cap">
-    </div>
+  </article>
+</section>
+</div>
 </body>
 </html>
