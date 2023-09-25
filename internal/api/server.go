@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -64,15 +65,13 @@ func StartServer() {
 	// 	c.HTML(http.StatusOK, "item.tmpl", gin.H{"RecipientsID": id})
 	// })
 	r.GET("/recipients", func(c *gin.Context) {
-		filter := c.Query("filter")
-		field := c.Query("field")
-		filteredRecipients := filterRecipients(recipients, filter, field)
+		Name := c.Query("Name")
+		filteredRecipients := filterRecipients(recipients, Name)
 
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			// "Recipients": recipients,
 			"Recipients": filteredRecipients,
-			"filter":     filter,
-			"field":      field,
+			"Name":       Name,
 		})
 	})
 
@@ -100,15 +99,21 @@ func StartServer() {
 	log.Println("Server down")
 }
 
-func filterRecipients(recipients []models.Recipients, filter string, field string) []models.Recipients {
+func filterRecipients(recipients []models.Recipients, filter string) []models.Recipients {
 	if filter == "" {
 		return recipients
 	}
 	var filtered []models.Recipients
 	for _, recipient := range recipients {
-		if field == "First_name" && contains(recipient.Name.First_name, filter) {
-			filtered = append(filtered, recipient)
-		} else if field == "Email" && contains(recipient.Email, filter) {
+		nameParts := strings.Fields(filter)
+		matches := false
+		for _, part := range nameParts {
+			if contains(recipient.Name.First_name, part) || contains(recipient.Name.Second_name, part) {
+				matches = true
+				break
+			}
+		}
+		if matches {
 			filtered = append(filtered, recipient)
 		}
 	}

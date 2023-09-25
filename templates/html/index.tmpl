@@ -5,14 +5,10 @@
   <link href="/css/product_card.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-  <h1>Список услуг</h1>
+  <h1>Список получателей</h1>
 <p>
 <form action="/recipients" method="get">
-    <input type="text" name="filter" value = "{{.filter}}" placeholder="Фильтр">
-    <select name = "field">
-    <option value = "First_name"> По имени </option>
-    <option value = "Email"> По почте </option>
-    </select>
+    <input type="text" name="Name" value = "{{.Name}}" placeholder="Введите ФИО">
     <button type="submit">Фильтровать</button>
 </p>
 </form>
@@ -25,7 +21,7 @@
         <img src={{.ImageSrc}} alt="" />
       
       <div class="article-body">
-        <h2>{{.Name.First_name}}</h2>
+        <h2>{{.Name.First_name}} {{.Name.Second_name}}</h2>
         <p>
           {{.Email}}
         </p>
