@@ -11,12 +11,14 @@ type Status struct {
 }
 
 type User struct {
-	UserId   uint   `gorm:"primaryKey"`
-	Login    string `gorm:"size:30;not null"`
-	Password string `gorm:"size:30;not null"`
+	UserId    uint   `gorm:"primaryKey"`
+	Login     string `gorm:"size:30;not null"`
+	Password  string `gorm:"size:30;not null"`
+	Name      string `gorm:"size:50;not null"`
+	Moderator bool   `gorm:"not null"`
 }
 
-type Recipients struct {
+type Recipient struct {
 	RecipientId uint   `gorm:"primaryKey;not null;autoIncrement:false"`
 	FIO         string `gorm:"size:100;not null"`
 	ImageURL    string `gorm:"size:100;not null"`
@@ -31,10 +33,13 @@ type Notification struct {
 	CreationDate     time.Time  `gorm:"not null;type:date"`
 	FormationDate    *time.Time `gorm:"type:date"`
 	CompletionDate   *time.Time `gorm:"type:date"`
-	Moderator        string     `gorm:"size:50;not null"`
+	ModeratorId      uint       `gorm:"not null"`
+	CustomerId       uint       `gorm:"not null"`
 	NotificationType string     `gorm:"size:50;not null"`
 
-	Status Status
+	Status    Status
+	Moderator User `gorm:"foreignKey:ModeratorId"`
+	Customer  User `gorm:"foreignKey:CustomerId"`
 }
 
 type NotificationContent struct {
@@ -42,6 +47,6 @@ type NotificationContent struct {
 	NotificationId uint   `gorm:"primaryKey;not null;autoIncrement:false"`
 	MessageContent string `gorm:"size:100;not null"`
 
-	Container      Container      `gorm:"foreignKey:ContainerId"`
-	Transportation Transportation `gorm:"foreignKey:TransportationId"`
+	Recipient    Recipient    `gorm:"foreignKey:RecipientId"`
+	Notification Notification `gorm:"foreignKey:NotificationId"`
 }
