@@ -47,6 +47,6 @@ type NotificationContent struct {
 	NotificationId uint   `gorm:"primaryKey;not null;autoIncrement:false"`
 	MessageContent string `gorm:"size:100;not null"`
 
-	Recipient    Recipient    `gorm:"foreignKey:RecipientId"`
-	Notification Notification `gorm:"foreignKey:NotificationId"`
+	Recipient    *Recipient    `gorm:"foreignKey:RecipientId"`
+	Notification *Notification `gorm:"foreignKey:NotificationId"`
 }
