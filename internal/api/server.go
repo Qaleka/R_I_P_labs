@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"lab1/internal/models"
+	"R_I_P_labs/internal/models"
 )
 
 func StartServer() {

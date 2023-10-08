@@ -3,15 +3,12 @@ package app
 import (
 	"log"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 
 	"R_I_P_labs/internal/app/config"
 	"R_I_P_labs/internal/app/dsn"
 	"R_I_P_labs/internal/app/repository"
-	"R_I_P_labs/internal/models"
 )
 
 type Application struct {
@@ -24,31 +21,55 @@ func (a *Application) Run() {
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/html/*")
 
-	recipients := models.GetCardsInfo()
-
 	r.GET("/recipients", func(c *gin.Context) {
-		Name := c.Query("Name")
-		filteredRecipients := filterRecipients(recipients, Name)
+		FIO := c.Query("FIO")
 
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{
-			// "Recipients": recipients,
-			"Recipients": filteredRecipients,
-			"Name":       Name,
-		})
+		if FIO != "" {
+			recipients, err := a.repo.GetRecipientByName(FIO)
+			if err != nil {
+				log.Println("cant get recipients", err)
+				c.Error(err)
+				return
+			}
+			c.HTML(http.StatusOK, "index.tmpl", recipients)
+			return
+		}
+
+		recipients, err := a.repo.GetAllRecipients()
+		if err != nil {
+			log.Println("cant get recipients", err)
+			c.Error(err)
+			return
+		}
+
+		c.HTML(http.StatusOK, "index.tmpl", recipients)
 	})
 
 	r.GET("/recipients/:id", func(c *gin.Context) {
-		idStr := c.Param("id")
-		id, err := strconv.Atoi(idStr)
-		if err != nil || id < 0 || id >= len(recipients) {
-			c.String(http.StatusNotFound, "Страница не найдена")
+		id := c.Param("id")
+		recipient, err := a.repo.GetRecipientByID(id)
+		if err != nil { // если не получилось
+			log.Printf("cant get product by id %v", err)
+			c.Error(err)
 			return
 		}
-		recipient := recipients[id]
 
-		c.HTML(http.StatusOK, "item.tmpl", gin.H{
-			"Recipients": recipient,
-		})
+		c.HTML(http.StatusOK, "item.tmpl", *recipient)
+	})
+
+	r.POST("/recipients", func(c *gin.Context) {
+		id := c.PostForm("deliver")
+
+		a.repo.DeliviredNotification(id)
+
+		recipients, err := a.repo.GetAllRecipients()
+		if err != nil {
+			log.Println("cant get recipients", err)
+			c.Error(err)
+			return
+		}
+
+		c.HTML(http.StatusOK, "index.tmpl", recipients)
 	})
 
 	r.Static("/image", "./resources")
@@ -61,33 +82,6 @@ func (a *Application) Run() {
 	log.Println("Server down")
 }
 
-func filterRecipients(recipients []models.Recipients, filter string) []models.Recipients {
-	if filter == "" {
-		return recipients
-	}
-	var filtered []models.Recipients
-	for _, recipient := range recipients {
-		nameParts := strings.Fields(filter)
-		matches := false
-		for _, part := range nameParts {
-			if contains(recipient.Name.First_name, part) || contains(recipient.Name.Second_name, part) {
-				matches = true
-				break
-			}
-		}
-		if matches {
-			filtered = append(filtered, recipient)
-		}
-	}
-
-	return filtered
-}
-
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && s[:len(substr)] == substr
-}
-
-// Создание объекта Application, заполнение его конфигом, роутером веб сервера, подключением к базе данных.
 func New() (*Application, error) {
 	var err error
 	app := Application{}

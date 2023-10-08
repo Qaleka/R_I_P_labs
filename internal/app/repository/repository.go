@@ -25,43 +25,45 @@ func New(dsn string) (*Repository, error) {
 	}, nil
 }
 
-func (r *Repository) GetRecipientByID(id string) (*RecipientInfo, error) {
+func (r *Repository) GetRecipientByID(id string) (*ds.Recipient, error) { // ?
 	recipient := &ds.Recipient{}
 
 	// err := r.db.First(container, "container_id = ?", id).Error
-	err := r.db.Where("container_id = ?", id).First(recipient).Error
+	err := r.db.Where("recipient_id = ?", id).First(recipient).Error
 	if err != nil {
 		return nil, err
 	}
 
-	nContent := &ds.NotificationContent{}
+	return recipient, nil
 
-	err = r.db.Where("notification_id = ?", recipient.RecipientId).First(nContent).Error
-	if err != nil {
-		nContent.Cargo = "Отсутствует"
-		nContent.Weight = 0
-	}
+	// nContent := &ds.NotificationContent{}
 
-	return &ds.RecipientInfo{
-		RecipientId: recipient.RecipientId,
-		ImageURL:    recipient.ImageURL,
-		FIO:         recipient.FIO,
-		Email:       recipient.Email,
-		Cargo:       tComposition.Cargo,
-		Weight:      tComposition.Weight,
-	}, nil
+	// err = r.db.Where("notification_id = ?", recipient.RecipientId).First(nContent).Error
+	// if err != nil {
+	// 	nContent.Cargo = "Отсутствует"
+	// 	nContent.Weight = 0
+	// }
+
+	// return &ds.RecipientInfo{
+	// 	RecipientId: recipient.RecipientId,
+	// 	ImageURL:    recipient.ImageURL,
+	// 	FIO:         recipient.FIO,
+	// 	Email:       recipient.Email,
+	// 	Cargo:       tComposition.Cargo,
+	// 	Weight:      tComposition.Weight,
+	// }, nil
 }
 
-type RecipientInfo struct {
-	RecipientId string
-	ImageURL    string
-	FIO         string
-	Email       string
-	Age         int
-	Adress      string
-}
+// type RecipientInfo struct {
+// 	RecipientId string
+// 	ImageURL    string
+// 	FIO         string
+// 	Email       string
+// 	Age         int
+// 	Adress      string
+// }
 
-func (r *Repository) GetAllContainers() ([]ds.Recipient, error) { //FIO ?
+func (r *Repository) GetAllRecipients() ([]ds.Recipient, error) { //FIO ?
 	var recipients []ds.Recipient
 
 	err := r.db.Preload("FIO").Find(&recipients).Error
@@ -72,23 +74,22 @@ func (r *Repository) GetAllContainers() ([]ds.Recipient, error) { //FIO ?
 	return recipients, nil
 }
 
-func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, error) {
-	var containers []ds.Container
+func (r *Repository) GetRecipientByName(FIO string) ([]ds.Recipient, error) {
+	var recipients []ds.Recipient
 
-	err := r.db.Preload("ContainerType").
-		Joins("INNER JOIN container_types ON containers.type_id = container_types.container_type_id").
-		Where("LOWER(container_types.name) LIKE ?", "%"+strings.ToLower(containerType)+"%").
-		Find(&containers).Error
+	err := r.db.
+		Where("LOWER(recipients.FIO) LIKE ?", "%"+strings.ToLower(FIO)+"%").
+		Find(&recipients).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return containers, nil
+	return recipients, nil
 }
 
-func (r *Repository) DecommissionContainer(id string) error {
-	err := r.db.Exec("UPDATE containers SET decommissioned = ? WHERE container_id = ?", true, id).Error
+func (r *Repository) DeliviredNotification(id string) error {
+	err := r.db.Exec("UPDATE recipients SET delivired = ? WHERE recipient_id = ?", true, id).Error
 	if err != nil {
 		return err
 	}

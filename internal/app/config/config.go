@@ -1,7 +1,6 @@
 package config
 
 import (
-	"context"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -18,7 +17,7 @@ type Config struct {
 }
 
 // NewConfig Создаёт новый объект конфигурации, загружая данные из файла конфигурации
-func NewConfig(ctx context.Context) (*Config, error) {
+func NewConfig() (*Config, error) {
 	var err error
 
 	configName := "config"

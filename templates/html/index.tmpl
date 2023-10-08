@@ -14,18 +14,24 @@
 </form>
 
 <section class="articles">
-{{range .Recipients}}
+{{range $key, $value := .}}
   <article>
     <div class="article-wrapper">
       
-        <img src={{.ImageSrc}} alt="" />
+        <img src={{$value.ImageSrc}} alt="" />
       
       <div class="article-body">
-        <h2>{{.Name.First_name}} {{.Name.Second_name}}</h2>
+        <h2>{{$value.FIO}}</h2>
         <p>
-          {{.Email}}
+          {{$value.Email}}
         </p>
-        <a href="/recipients/{{.Id}}" class="read-more">
+        {{if not .Decommissioned}}
+        <form action="/recipients" method="post">
+                        <input type="hidden" name="deliver" value="{{.RecipientId}}">
+                        <input type="submit" value="Доставить" class="read-more" style="width: 100%;">
+                    </form>
+        {{end}}
+        <a href="/recipients/{{$value.Id}}" class="read-more">
           Подробнее <span class="sr-only">about this is some title</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />

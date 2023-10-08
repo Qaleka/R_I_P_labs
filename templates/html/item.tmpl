@@ -11,17 +11,17 @@
 <section class="articles">
   <article>
     <div class="article-wrapper">
-        <img src="{{.Recipients.ImageSrc}}" alt="" />
+        <img src="{{.ImageSrc}}" alt="" />
       <div class="article-body">
-        <h2>{{.Recipients.Name.First_name}} {{.Recipients.Name.Second_name}} {{.Recipients.Name.Third_name}}</h2>
+        <h2>{{.FIO}}</h2>
         <div>
-          <b>Почта:</b>  {{.Recipients.Email}}
+          <b>Почта:</b>  {{.Email}}
         </div>
         <div>
-          <b>Возраст:</b>  {{.Recipients.Age}}
+          <b>Возраст:</b>  {{.Age}}
         </div>
         <div>
-          <b>Адрес:</b>  {{.Recipients.Adress}}
+          <b>Адрес:</b>  {{.Adress}}
         </div>
       </div>
     </div>
