@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"R_I_P_labs/internal/app/config"
+	"R_I_P_labs/internal/app/ds"
 	"R_I_P_labs/internal/app/dsn"
 	"R_I_P_labs/internal/app/repository"
 )
@@ -17,32 +18,35 @@ type Application struct {
 	// dsn string
 }
 
+type GetRecipientsBack struct {
+	Recipients []ds.Recipient
+	Name string
+}
+
 func (a *Application) Run() {
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/html/*")
 
 	r.GET("/recipients", func(c *gin.Context) {
 		FIO := c.Query("FIO")
+		var recipients []ds.Recipient
+		var err error
 
 		if FIO != "" {
 			recipients, err := a.repo.GetRecipientByName(FIO)
+		 } else {
+			recipients, err := a.repo.GetAllRecipients() 
+		 }
 			if err != nil {
 				log.Println("cant get recipients", err)
 				c.Error(err)
 				return
 			}
-			c.HTML(http.StatusOK, "index.tmpl", recipients)
-			return
+		c.HTML(http.StatusOK, "index.tmpl", GetRecipientsBack) {
+				Name: FIO,
+				Recipients: recipients,
 		}
 
-		recipients, err := a.repo.GetAllRecipients()
-		if err != nil {
-			log.Println("cant get recipients", err)
-			c.Error(err)
-			return
-		}
-
-		c.HTML(http.StatusOK, "index.tmpl", recipients)
 	})
 
 	r.GET("/recipients/:id", func(c *gin.Context) {
@@ -74,11 +78,7 @@ func (a *Application) Run() {
 
 	r.Static("/image", "./resources")
 	r.Static("/css", "./static/css")
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
-
-	log.Println("Server down")
-
-	r.Run()
+	r.Run("localhost:9000") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 	log.Println("Server down")
 }
 

@@ -66,7 +66,7 @@ func (r *Repository) GetRecipientByID(id string) (*ds.Recipient, error) { // ?
 func (r *Repository) GetAllRecipients() ([]ds.Recipient, error) { //FIO ?
 	var recipients []ds.Recipient
 
-	err := r.db.Preload("FIO").Find(&recipients).Error
+	err := r.db.Find(&recipients).Error
 	if err != nil {
 		return nil, err
 	}
