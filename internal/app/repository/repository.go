@@ -89,7 +89,7 @@ func (r *Repository) GetRecipientByName(FIO string) ([]ds.Recipient, error) {
 }
 
 func (r *Repository) DeliviredNotification(id string) error {
-	err := r.db.Exec("UPDATE recipients SET delivired = ? WHERE recipient_id = ?", true, id).Error
+	err := r.db.Exec("UPDATE recipients SET delivered = ? WHERE recipient_id = ?", true, id).Error
 	if err != nil {
 		return err
 	}
