@@ -5,11 +5,6 @@ import (
 	"time"
 )
 
-type Status struct {
-	StatusId uint   `gorm:"primaryKey"`
-	Name     string `gorm:"size:50;not null"`
-}
-
 type User struct {
 	UserId    uint   `gorm:"primaryKey"`
 	Login     string `gorm:"size:30;not null"`
@@ -30,7 +25,7 @@ type Recipient struct {
 
 type Notification struct {
 	NotificationId   uint       `gorm:"primaryKey"`
-	StatusId         uint       `gorm:"not null"`
+	Status           string     `gorm:"size:50;not null"`
 	CreationDate     time.Time  `gorm:"not null;type:date"`
 	FormationDate    *time.Time `gorm:"type:date"`
 	CompletionDate   *time.Time `gorm:"type:date"`
@@ -38,7 +33,6 @@ type Notification struct {
 	CustomerId       uint       `gorm:"not null"`
 	NotificationType string     `gorm:"size:50;not null"`
 
-	Status    Status
 	Moderator User `gorm:"foreignKey:ModeratorId"`
 	Customer  User `gorm:"foreignKey:CustomerId"`
 }

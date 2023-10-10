@@ -20,7 +20,7 @@ type Application struct {
 
 type GetRecipientsBack struct {
 	Recipients []ds.Recipient
-	Name string
+	Name       string
 }
 
 func (a *Application) Run() {
@@ -29,23 +29,17 @@ func (a *Application) Run() {
 
 	r.GET("/recipients", func(c *gin.Context) {
 		FIO := c.Query("FIO")
-		var recipients []ds.Recipient
-		var err error
+		recipients, err := a.repo.GetRecipientByName(FIO)
 
-		if FIO != "" {
-			recipients, err := a.repo.GetRecipientByName(FIO)
-		 } else {
-			recipients, err := a.repo.GetAllRecipients() 
-		 }
-			if err != nil {
-				log.Println("cant get recipients", err)
-				c.Error(err)
-				return
-			}
-		c.HTML(http.StatusOK, "index.tmpl", GetRecipientsBack) {
-				Name: FIO,
-				Recipients: recipients,
+		if err != nil {
+			log.Println("cant get recipients", err)
+			c.Error(err)
+			return
 		}
+		c.HTML(http.StatusOK, "index.tmpl", GetRecipientsBack{
+			Name:       FIO,
+			Recipients: recipients,
+		})
 
 	})
 
@@ -66,14 +60,17 @@ func (a *Application) Run() {
 
 		a.repo.DeliviredNotification(id)
 
-		recipients, err := a.repo.GetAllRecipients()
+		recipients, err := a.repo.GetRecipientByName("")
 		if err != nil {
 			log.Println("cant get recipients", err)
 			c.Error(err)
 			return
 		}
 
-		c.HTML(http.StatusOK, "index.tmpl", recipients)
+		c.HTML(http.StatusOK, "index.tmpl", GetRecipientsBack{
+			Name:       "",
+			Recipients: recipients,
+		})
 	})
 
 	r.Static("/image", "./resources")

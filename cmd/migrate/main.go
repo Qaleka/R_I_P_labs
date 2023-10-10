@@ -20,7 +20,6 @@ func main() {
 	err = db.AutoMigrate(
 		&ds.User{},
 		&ds.Recipient{},
-		&ds.Status{},
 		&ds.Notification{},
 		&ds.NotificationContent{},
 	)

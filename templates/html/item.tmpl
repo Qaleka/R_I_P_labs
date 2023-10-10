@@ -11,7 +11,7 @@
 <section class="articles">
   <article>
     <div class="article-wrapper">
-        <img src="{{.ImageSrc}}" alt="" />
+        <img src="{{.ImageURL}}" alt="" />
       <div class="article-body">
         <h2>{{.FIO}}</h2>
         <div>
@@ -22,6 +22,11 @@
         </div>
         <div>
           <b>Адрес:</b>  {{.Adress}}
+        </div>
+        <div>
+        {{if .Delivered}}
+                <b>Сообщение доставлено</b>
+            {{end}}
         </div>
       </div>
     </div>
