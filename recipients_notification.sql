@@ -4,12 +4,13 @@ DROP TABLE IF EXISTS "notification_contents";
 CREATE TABLE "public"."notification_contents" (
     "recipient_id" bigint NOT NULL,
     "notification_id" bigint NOT NULL,
-    "message_content" character varying(100) NOT NULL,
     CONSTRAINT "notification_contents_pkey" PRIMARY KEY ("recipient_id", "notification_id")
 ) WITH (oids = false);
 
-INSERT INTO "notification_contents" ("recipient_id", "notification_id", "message_content") VALUES
-(1,	1,	'Срочное уведомление о задолжности');
+INSERT INTO "notification_contents" ("recipient_id", "notification_id") VALUES
+(1,	1),
+(2,	4),
+(3,	3);
 
 DROP TABLE IF EXISTS "notifications";
 DROP SEQUENCE IF EXISTS notifications_notification_id_seq;
@@ -28,7 +29,11 @@ CREATE TABLE "public"."notifications" (
 ) WITH (oids = false);
 
 INSERT INTO "notifications" ("notification_id", "status", "creation_date", "formation_date", "completion_date", "moderator_id", "customer_id", "notification_type") VALUES
-(1,	'Введен',	'2023-10-09',	'2023-11-09',	NULL,	2,	1,	'Срочное сообщение');
+(1,	'Введен',	'2023-10-09',	'2023-11-09',	'2023-12-09',	2,	1,	'Срочное сообщение'),
+(2,	'В работе',	'2023-09-24',	'2023-09-27',	NULL,	2,	1,	'Еженедельное уведомление'),
+(3,	'Завершен',	'2023-10-09',	NULL,	NULL,	2,	1,	'Электронное напоминание'),
+(4,	'Отменен',	'2023-09-15',	'2023-09-15',	'2023-09-16',	2,	1,	'Уведомление о задолжности'),
+(5,	'Удален',	'2023-10-08',	'2023-10-09',	'2023-10-10',	2,	1,	'Уведомление о доступе на сайт');
 
 DROP TABLE IF EXISTS "recipients";
 CREATE TABLE "public"."recipients" (
@@ -43,7 +48,9 @@ CREATE TABLE "public"."recipients" (
 ) WITH (oids = false);
 
 INSERT INTO "recipients" ("recipient_id", "fio", "image_url", "email", "age", "adress", "delivered") VALUES
-(1,	'Олег Орлов Никитович',	'http://localhost:8080/image/men1.jpg',	'OlegO@mail.ru',	27,	'Москва, ул. Измайловская, д.13, кв.54',	NULL);
+(1,	'Олег Орлов Никитович',	'http://localhost:9000/image/men1.jpg',	'OlegO@mail.ru',	27,	'Москва, ул. Измайловская, д.13, кв.54',	't'),
+(3,	'Александр Лейко Кириллович',	'http://localhost:9000/image/men3.jpg',	'Alek221@mail.ru',	37,	'Москва, ул. Изюмская, д.15, кв.89',	'f'),
+(2,	'Василий Гречко Валентинович',	'http://localhost:9000/image/men2.jpg',	'Grechko_101@mail.ru',	31,	'Москва, ул. Тверская, д.25, кв.145',	'f');
 
 DROP TABLE IF EXISTS "users";
 DROP SEQUENCE IF EXISTS users_user_id_seq;
@@ -68,4 +75,4 @@ ALTER TABLE ONLY "public"."notification_contents" ADD CONSTRAINT "fk_notificatio
 ALTER TABLE ONLY "public"."notifications" ADD CONSTRAINT "fk_notifications_customer" FOREIGN KEY (customer_id) REFERENCES users(user_id) NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."notifications" ADD CONSTRAINT "fk_notifications_moderator" FOREIGN KEY (moderator_id) REFERENCES users(user_id) NOT DEFERRABLE;
 
--- 2023-10-10 14:29:23.077514+00
+-- 2023-10-10 21:49:05.980909+00

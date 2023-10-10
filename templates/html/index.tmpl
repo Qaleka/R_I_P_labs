@@ -8,7 +8,7 @@
   <h1>Список получателей</h1>
 <p>
 <form action="/recipients" method="get">
-    <input type="text" name="Name" value="{{if ne .Name ""}}{{.Name}}{{end}}" placeholder="Введите ФИО">
+    <input type="text" name="FIO" value="{{if ne .Name ""}}{{.Name}}{{end}}" placeholder="Введите ФИО">
     <button type="submit" class = "button-7">Фильтровать</button>
 </p>
 </form>
@@ -28,7 +28,7 @@
         {{if not .Delivered}}
         <form action="/recipients" method="post">
                         <input type="hidden" name="deliver" value="{{.RecipientId}}">
-                        <input type="submit" value="Доставить" class="button-7" style="width: 100%;">
+                        <input type="submit" value="Доставить уведомление" class="button-7" style="width: 100%;">
                     </form>
         {{end}}
         <p> </p>

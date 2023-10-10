@@ -13,6 +13,7 @@ article {
   background-image: linear-gradient( to right, #48e6f1,#ffe6e6);
 }
 
+
 article a::after {
   position: absolute;
   inset-block: 0;

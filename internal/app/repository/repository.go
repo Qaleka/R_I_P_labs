@@ -78,7 +78,7 @@ func (r *Repository) GetRecipientByName(FIO string) ([]ds.Recipient, error) {
 	var recipients []ds.Recipient
 
 	err := r.db.
-		Where("LOWER(recipients.FIO) LIKE ?", "%"+strings.ToLower(FIO)+"%").
+		Where("LOWER(recipients.fio) LIKE ?", "%"+strings.ToLower(FIO)+"%").
 		Find(&recipients).Error
 
 	if err != nil {
