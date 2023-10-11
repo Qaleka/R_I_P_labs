@@ -24,8 +24,8 @@
           <b>Адрес:</b>  {{.Adress}}
         </div>
         <div>
-        {{if .Delivered}}
-                <b style = "color:#ff0000">Сообщение доставлено</b>
+        {{if .IsDeleted}}
+                <b style = "color:#ff0000">Получатель удален</b>
             {{end}}
         </div>
       </div>

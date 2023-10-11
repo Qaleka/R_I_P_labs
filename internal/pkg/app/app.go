@@ -56,7 +56,7 @@ func (a *Application) Run() {
 	})
 
 	r.POST("/recipients", func(c *gin.Context) {
-		id := c.PostForm("deliver")
+		id := c.PostForm("delete")
 
 		a.repo.DeliviredNotification(id)
 

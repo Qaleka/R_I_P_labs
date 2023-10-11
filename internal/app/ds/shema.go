@@ -20,7 +20,7 @@ type Recipient struct {
 	Email       string `gorm:"size:50;not null"`
 	Age         uint   `gorm:"not null"`
 	Adress      string `gorm:"size:100;not null"`
-	Delivered   bool   `gorm:not null"`
+	IsDeleted   bool   `gorm:not null"`
 }
 
 type Notification struct {

@@ -25,10 +25,10 @@
         <p>
           {{$value.Email}}
         </p>
-        {{if not .Delivered}}
+        {{if not .IsDeleted}}
         <form action="/recipients" method="post">
-                        <input type="hidden" name="deliver" value="{{.RecipientId}}">
-                        <input type="submit" value="Доставить уведомление" class="button-7" style="width: 100%;">
+                        <input type="hidden" name="delete" value="{{.RecipientId}}">
+                        <input type="submit" value="Удалить" class="button-7" style="width: 100%;">
                     </form>
         {{end}}
         <p> </p>
