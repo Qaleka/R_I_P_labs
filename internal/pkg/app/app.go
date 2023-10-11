@@ -58,7 +58,7 @@ func (a *Application) Run() {
 	r.POST("/recipients", func(c *gin.Context) {
 		id := c.PostForm("delete")
 
-		a.repo.DeliviredNotification(id)
+		a.repo.DeleteRecipient(id)
 
 		recipients, err := a.repo.GetRecipientByName("")
 		if err != nil {
