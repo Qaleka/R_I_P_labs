@@ -1,6 +1,5 @@
 package repository
 
-//вопрос владу
 import (
 	"strings"
 
