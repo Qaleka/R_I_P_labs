@@ -12,8 +12,10 @@ import (
 // Содержит все конфигурационные данные о сервисе;
 // автоподгружается при изменении исходного файла
 type Config struct {
-	ServiceHost string
-	ServicePort int
+	ServiceHost   string
+	ServicePort   int
+	MinioEndpoint string
+	BucketName    string
 }
 
 // NewConfig Создаёт новый объект конфигурации, загружая данные из файла конфигурации

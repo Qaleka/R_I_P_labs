@@ -5,6 +5,12 @@ import (
 	"time"
 )
 
+const DRAFT string = "черновик"
+const FORMED string = "сформирован"
+const COMPELTED string = "завершён"
+const REJECTED string = "отклонён"
+const DELETED string = "удалён"
+
 type User struct {
 	UUID      string `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"uuid"`
 	Login     string `gorm:"size:30;not null" json:"login"`
@@ -38,8 +44,8 @@ type Notification struct {
 }
 
 type NotificationContent struct {
-	RecipientId    uint `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"recipient_id"`
-	NotificationId uint `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"notification_id"`
+	RecipientId    string `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"recipient_id"`
+	NotificationId string `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"notification_id"`
 
 	Recipient    *Recipient    `gorm:"foreignKey:RecipientId" json:"recipient"`
 	Notification *Notification `gorm:"foreignKey:NotificationId" json:"notification"`

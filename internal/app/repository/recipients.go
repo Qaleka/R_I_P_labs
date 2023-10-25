@@ -9,11 +9,9 @@ import (
 	"R_I_P_labs/internal/app/ds"
 )
 
-func (r *Repository) GetRecipientByID(id string) (*ds.Recipient, error) {
+func (r *Repository) GetContainerByID(id string) (*ds.Recipient, error) {
 	recipient := &ds.Recipient{UUID: id}
-	err := r.db.
-		First(recipient).
-		Error
+	err := r.db.First(recipient, "is_deleted = ?", false).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -48,7 +46,6 @@ func (r *Repository) GetRecipientByName(FIO string) ([]ds.Recipient, error) {
 // исправить
 func (r *Repository) SaveRecipient(recipient *ds.Recipient) error {
 	err := r.db.Save(recipient).Error
-	// err := r.db.Session(&gorm.Session{FullSaveAssociations: true}).Save(&container).Error
 	if err != nil {
 		return err
 	}
