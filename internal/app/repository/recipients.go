@@ -9,7 +9,7 @@ import (
 	"R_I_P_labs/internal/app/ds"
 )
 
-func (r *Repository) GetContainerByID(id string) (*ds.Recipient, error) {
+func (r *Repository) GetRecipientByID(id string) (*ds.Recipient, error) {
 	recipient := &ds.Recipient{UUID: id}
 	err := r.db.First(recipient, "is_deleted = ?", false).Error
 	if err != nil {
@@ -43,9 +43,17 @@ func (r *Repository) GetRecipientByName(FIO string) ([]ds.Recipient, error) {
 	return recipients, nil
 }
 
-// исправить
 func (r *Repository) SaveRecipient(recipient *ds.Recipient) error {
 	err := r.db.Save(recipient).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Repository) AddToNotification(notificationId, recipientId string) error {
+	NotContent := ds.NotificationContent{NotificationId: notificationId, RecipientId: recipientId}
+	err := r.db.Create(&NotContent).Error
 	if err != nil {
 		return err
 	}

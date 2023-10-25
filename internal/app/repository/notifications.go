@@ -10,19 +10,25 @@ import (
 	"R_I_P_labs/internal/app/ds"
 )
 
-func (r *Repository) GetAllNotifications(formationDate *time.Time, status string) ([]ds.Notification, error) {
+func (r *Repository) GetAllNotifications(formationDateStart, formationDateEnd *time.Time, status string) ([]ds.Notification, error) {
 	var notifications []ds.Notification
 	var err error
 
-	if formationDate != nil {
+	if formationDateStart != nil && formationDateEnd != nil {
 		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
-			Where("formation_date = ?", formationDate).
+			Where("formation_date BETWEEN ? AND ?", *formationDateStart, *formationDateEnd).
 			Find(&notifications).Error
-	} else if status != "" {
+	} else if formationDateStart != nil {
 		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+			Where("formation_date >= ?", *formationDateStart).
+			Find(&notifications).Error
+	} else if formationDateEnd != nil {
+		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+			Where("formation_date <= ?", *formationDateEnd).
 			Find(&notifications).Error
 	} else {
-		err = r.db.Find(&notifications).Error
+		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+			Find(&notifications).Error
 	}
 	if err != nil {
 		return nil, err
@@ -42,6 +48,15 @@ func (r *Repository) GetDraftNotification(customerId string) (*ds.Notification, 
 		if err != nil {
 			return nil, err
 		}
+	}
+	return notification, nil
+}
+
+func (r *Repository) CreateDraftNotification(customerId string) (*ds.Notification, error) {
+	notification := &ds.Notification{CreationDate: time.Now(), CustomerId: customerId, Status: ds.DRAFT}
+	err := r.db.Create(notification).Error
+	if err != nil {
+		return nil, err
 	}
 	return notification, nil
 }
@@ -81,7 +96,7 @@ func (r *Repository) SaveNotification(notification *ds.Notification) error {
 	return nil
 }
 
-func (r *Repository) DeleteFromTransportation(notificationId, recipientId string) error {
+func (r *Repository) DeleteFromNotification(notificationId, recipientId string) error {
 	err := r.db.Delete(&ds.NotificationContent{NotificationId: notificationId, RecipientId: recipientId}).Error
 	if err != nil {
 		return err
