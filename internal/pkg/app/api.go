@@ -60,7 +60,17 @@ func (app *Application) GetAllRecipients(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, schemes.AllRecipientsResponse{Recipients: recipients})
+	draftNotification, err := app.repo.GetDraftNotification(app.getCustomer())
+	fmt.Println(draftNotification)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	var draftNotificationId *string = nil
+	if draftNotification != nil {
+		draftNotificationId = &draftNotification.UUID
+	}
+	c.JSON(http.StatusOK, schemes.GetAllRecipientsResponse{DraftNotificationId: draftNotificationId, Recipients: recipients})
 }
 
 func (app *Application) GetRecipient(c *gin.Context) {
@@ -227,7 +237,11 @@ func (app *Application) GetAllNotifications(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.AllNotificationsResponse{Notifications: notifications})
+	outputNotifications := make([]schemes.NotificationOutput, len(notifications))
+	for i, notification := range notifications {
+		outputNotifications[i] = schemes.ConvertNotification(&notification)
+	}
+	c.JSON(http.StatusOK, schemes.AllNotificationsResponse{Notifications: outputNotifications})
 }
 
 func (app *Application) GetNotification(c *gin.Context) {
@@ -252,7 +266,7 @@ func (app *Application) GetNotification(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, schemes.NotificationResponse{Notification: *notification, Recipient: recipients})
+	c.JSON(http.StatusOK, schemes.NotificationResponse{Notification: schemes.ConvertNotification(notification), Recipients: recipients})
 }
 
 func (app *Application) UpdateNotification(c *gin.Context) {
@@ -280,7 +294,7 @@ func (app *Application) UpdateNotification(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.UpdateNotificationResponse{Notification: *notification})
+	c.JSON(http.StatusOK, schemes.UpdateNotificationResponse{Notification:schemes.ConvertNotification(notification)})
 }
 
 func (app *Application) DeleteNotification(c *gin.Context) {

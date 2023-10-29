@@ -8,15 +8,57 @@ type AllRecipientsResponse struct {
 	Recipients []ds.Recipient `json:"recipients"`
 }
 
+type GetAllRecipientsResponse struct {
+	DraftNotificationId *string        `json:"draft_notification_id"`
+	Recipients            []ds.Recipient `json:"recipients"`
+}
+
 type AllNotificationsResponse struct {
-	Notifications []ds.Notification `json:"notifications"`
+	Notifications []NotificationOutput `json:"notifications"`
 }
 
 type NotificationResponse struct {
-	Notification ds.Notification `json:"notifications"`
-	Recipient    []ds.Recipient  `json:"recipients"`
+	Notification NotificationOutput `json:"notification"`
+	Recipients    []ds.Recipient  `json:"recipients"`
 }
 
 type UpdateNotificationResponse struct {
-	Notification ds.Notification `json:"notifications"`
+	Notification NotificationOutput  `json:"notifications"`
+}
+
+type NotificationOutput struct {
+	UUID           string  `json:"uuid"`
+	Status         string  `json:"status"`
+	CreationDate   string  `json:"creation_date"`
+	FormationDate  *string `json:"formation_date"`
+	CompletionDate *string `json:"completion_date"`
+	Moderator      *string `json:"moderator"`
+	Customer       string  `json:"customer"`
+	NotificationType      string  `json:"notification_type"`
+}
+
+func ConvertNotification(notification *ds.Notification) NotificationOutput {
+	output := NotificationOutput{
+		UUID:         notification.UUID,
+		Status:       notification.Status,
+		CreationDate: notification.CreationDate.Format("2006-01-02"),
+		NotificationType:    notification.NotificationType,
+		Customer:     notification.Customer.Name,
+	}
+
+	if notification.FormationDate != nil {
+		formationDate := notification.FormationDate.Format("2006-01-02")
+		output.FormationDate = &formationDate
+	}
+
+	if notification.CompletionDate != nil {
+		completionDate := notification.CompletionDate.Format("2006-01-02")
+		output.CompletionDate = &completionDate
+	}
+
+	if notification.Moderator != nil {
+		output.Moderator = &notification.Moderator.Name
+	}
+
+	return output
 }

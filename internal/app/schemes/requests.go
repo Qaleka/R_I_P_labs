@@ -19,7 +19,7 @@ type GetAllRecipientsRequest struct {
 // вопрос
 type AddRecipientRequest struct {
 	ds.Recipient
-	Image *multipart.FileHeader `form:"image"`
+	Image *multipart.FileHeader `form:"image" json:"image" binding:"required"`
 }
 
 type ChangeRecipientRequest struct {
@@ -27,7 +27,7 @@ type ChangeRecipientRequest struct {
 	FIO         *string               `form:"fio" json:"fio" binding:"omitempty,max=100"`
 	Email       *string               `form:"email" json:"email" binding:"omitempty,max=75"`
 	Age         *int                  `form:"age" json:"age"`
-	Image       *multipart.FileHeader `form:"image"`
+	Image       *multipart.FileHeader `form:"image" json:"image"`
 	Adress      *string               `form:"adress" json:"adress" binding:"omitempty,max=100"`
 }
 

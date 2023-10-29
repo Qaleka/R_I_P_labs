@@ -15,19 +15,23 @@ func (r *Repository) GetAllNotifications(formationDateStart, formationDateEnd *t
 	var err error
 
 	if formationDateStart != nil && formationDateEnd != nil {
-		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+		err = r.db.Preload("Customer").Preload("Moderator").
+			Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
 			Where("formation_date BETWEEN ? AND ?", *formationDateStart, *formationDateEnd).
 			Find(&notifications).Error
 	} else if formationDateStart != nil {
-		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+		err = r.db.Preload("Customer").Preload("Moderator").
+			Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
 			Where("formation_date >= ?", *formationDateStart).
 			Find(&notifications).Error
 	} else if formationDateEnd != nil {
-		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+		err = r.db.Preload("Customer").Preload("Moderator").
+			Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
 			Where("formation_date <= ?", *formationDateEnd).
 			Find(&notifications).Error
 	} else {
-		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+		err = r.db.Preload("Customer").Preload("Moderator").
+			Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
 			Find(&notifications).Error
 	}
 	if err != nil {
@@ -63,7 +67,8 @@ func (r *Repository) CreateDraftNotification(customerId string) (*ds.Notificatio
 
 func (r *Repository) GetNotificationById(notificationId, customerId string) (*ds.Notification, error) {
 	notification := &ds.Notification{}
-	err := r.db.First(notification, ds.Notification{UUID: notificationId, CustomerId: customerId}).Error
+	err := r.db.Preload("Moderator").Preload("Customer").
+	First(notification, ds.Notification{UUID: notificationId, CustomerId: customerId}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
