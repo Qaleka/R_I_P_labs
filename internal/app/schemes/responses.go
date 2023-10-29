@@ -8,8 +8,13 @@ type AllRecipientsResponse struct {
 	Recipients []ds.Recipient `json:"recipients"`
 }
 
+type NotificationShort struct {
+	UUID           string `json:"uuid"`
+	RecipientCount int    `json:"recipient_count"`
+}
+
 type GetAllRecipientsResponse struct {
-	DraftNotificationId *string        `json:"draft_notification_id"`
+	DraftNotification *NotificationShort         `json:"draft_notification"`
 	Recipients            []ds.Recipient `json:"recipients"`
 }
 

@@ -81,9 +81,9 @@ func (r *Repository) GetNotificationById(notificationId, customerId string) (*ds
 func (r *Repository) GetNotificationContent(notificationId string) ([]ds.Recipient, error) {
 	var recipients []ds.Recipient
 
-	err := r.db.Table("notification_content").
+	err := r.db.Table("notification_contents").
 		Select("recipients.*").
-		Joins("JOIN recipients ON notification_content.recipient_id = recipients.uuid").
+		Joins("JOIN recipients ON notification_contents.recipient_id = recipients.uuid").
 		Where(ds.NotificationContent{NotificationId: notificationId}).
 		Scan(&recipients).Error
 

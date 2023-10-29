@@ -40,11 +40,11 @@ func (app *Application) uploadImage(c *gin.Context, image *multipart.FileHeader,
 
 // вопрос
 func (app *Application) getCustomer() string {
-	return "5f58c307-a3f2-4b13-b888-c80ad08d5ed3"
+	return "2d217868-ab6d-41fe-9b34-7809083a2e8a"
 }
 
 func (app *Application) getModerator() *string {
-	moderaorId := "796c70e1-5f27-4433-a415-95e7272effa5"
+	moderaorId := "87d54d58-1e24-4cca-9c83-bd2523902729"
 	return &moderaorId
 }
 
@@ -61,16 +61,21 @@ func (app *Application) GetAllRecipients(c *gin.Context) {
 		return
 	}
 	draftNotification, err := app.repo.GetDraftNotification(app.getCustomer())
-	fmt.Println(draftNotification)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	var draftNotificationId *string = nil
+	response := schemes.GetAllRecipientsResponse{DraftNotification: nil, Recipients: recipients}
 	if draftNotification != nil {
-		draftNotificationId = &draftNotification.UUID
+		response.DraftNotification = &schemes.NotificationShort{UUID: draftNotification.UUID}
+		containers, err := app.repo.GetNotificationContent(draftNotification.UUID)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		response.DraftNotification.RecipientCount = len(containers)
 	}
-	c.JSON(http.StatusOK, schemes.GetAllRecipientsResponse{DraftNotificationId: draftNotificationId, Recipients: recipients})
+	c.JSON(http.StatusOK, response)
 }
 
 func (app *Application) GetRecipient(c *gin.Context) {

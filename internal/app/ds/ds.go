@@ -21,11 +21,11 @@ type User struct {
 
 type Recipient struct {
 	UUID      string  `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"uuid" binding:"-"`
-	FIO       string  `gorm:"size:100;not null" json:"fio" binding:"required"`
-	ImageURL  *string `gorm:"size:100;not null" json:"image_url" binding:"required"`
-	Email     string  `gorm:"size:75;not null" json:"email" binding:"required"`
-	Age       int     `gorm:"not null" json:"age" binding:"required"`
-	Adress    string  `gorm:"size:100;not null" json:"adress" binding:"required"`
+	FIO       string  `gorm:"size:100;not null" form:"fio" json:"fio" binding:"required"`
+	ImageURL  *string `gorm:"size:100" json:"image_url" binding:"-"`
+	Email     string  `gorm:"size:75;not null" form:"email" json:"email" binding:"required"`
+	Age       int     `gorm:"not null" json:"age" form:"age" binding:"required"`
+	Adress    string  `gorm:"size:100;not null" form:"adress" json:"adress" binding:"required"`
 	IsDeleted bool    `gorm:"not null;default:false" json:"-" binding:"-"`
 }
 
@@ -39,8 +39,8 @@ type Notification struct {
 	CustomerId       string     `gorm:"not null"`
 	NotificationType string     `gorm:"size:50;not null"`
 
-	Moderator *User 
-	Customer  User 
+	Moderator *User
+	Customer  User
 }
 
 type NotificationContent struct {
