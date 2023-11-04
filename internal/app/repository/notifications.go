@@ -44,14 +44,10 @@ func (r *Repository) GetDraftNotification(customerId string) (*ds.Notification, 
 	notification := &ds.Notification{}
 	err := r.db.First(notification, ds.Notification{Status: ds.DRAFT, CustomerId: customerId}).Error
 	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
 		}
-		notification = &ds.Notification{CreationDate: time.Now(), CustomerId: customerId, Status: ds.DRAFT}
-		err := r.db.Create(notification).Error
-		if err != nil {
-			return nil, err
-		}
+		return nil, err
 	}
 	return notification, nil
 }
