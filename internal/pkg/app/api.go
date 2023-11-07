@@ -91,7 +91,7 @@ func (app *Application) GetRecipient(c *gin.Context) {
 		return
 	}
 	if recipient == nil {
-		c.AbortWithError(http.StatusNotFound, fmt.Errorf("контейнер не найдена"))
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("получатель не найден"))
 		return
 	}
 	c.JSON(http.StatusOK, recipient)
@@ -107,6 +107,10 @@ func (app *Application) DeleteRecipient(c *gin.Context) {
 	recipient, err := app.repo.GetRecipientByID(request.RecipientId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	if recipient == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("получатель не найден"))
 		return
 	}
 	recipient.IsDeleted = true
@@ -163,6 +167,11 @@ func (app *Application) ChangeRecipient(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	if recipient == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("получатель не найден"))
+		return
+	}
+
 	if request.FIO != nil {
 		recipient.FIO = *request.FIO
 	}
@@ -199,6 +208,16 @@ func (app *Application) AddToNotification(c *gin.Context) {
 		return
 	}
 	var err error
+
+	recipient, err := app.repo.GetRecipientByID(request.RecipientId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	if recipient == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("получатель не найден"))
+		return
+	}
 
 	var notification *ds.Notification
 	notification, err = app.repo.GetDraftNotification(app.getCustomer())

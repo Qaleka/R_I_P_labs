@@ -32,9 +32,9 @@ type Recipient struct {
 type Notification struct {
 	UUID             string     `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
 	Status           string     `gorm:"size:20;not null"`
-	CreationDate     time.Time  `gorm:"not null;type:date"`
-	FormationDate    *time.Time `gorm:"type:date"`
-	CompletionDate   *time.Time `gorm:"type:date"`
+	CreationDate     time.Time  `gorm:"not null;type:timestamp"`
+	FormationDate    *time.Time `gorm:"type:timestamp"`
+	CompletionDate   *time.Time `gorm:"type:timestamp"`
 	ModeratorId      *string    `json:"-"`
 	CustomerId       string     `gorm:"not null"`
 	NotificationType string     `gorm:"size:50;not null"`

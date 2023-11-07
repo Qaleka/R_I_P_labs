@@ -29,21 +29,21 @@ func (app *Application) Run() {
 	r.Use(ErrorHandler())
 
 	// Услуги - получатели
-	r.GET("/recipients", app.GetAllRecipients)                                     // Список с поиском
-	r.GET("/recipients/:recipient_id", app.GetRecipient)                           // Одна услуга
-	r.DELETE("/recipients/:recipient_id", app.DeleteRecipient)              // Удаление
-	r.PUT("/recipients/:recipient_id", app.ChangeRecipient)                 // Изменение
-	r.POST("/recipients", app.AddRecipient)                                    // Добавление
-	r.POST("/recipients/:recipient_id/add_to_notification", app.AddToNotification) // Добавление в заявку
+	r.GET("/api/recipients", app.GetAllRecipients)                                     // Список с поиском
+	r.GET("/api/recipients/:recipient_id", app.GetRecipient)                           // Одна услуга
+	r.DELETE("/api/recipients/:recipient_id", app.DeleteRecipient)              // Удаление
+	r.PUT("/api/recipients/:recipient_id", app.ChangeRecipient)                 // Изменение
+	r.POST("/api/recipients", app.AddRecipient)                                    // Добавление
+	r.POST("/api/recipients/:recipient_id/add_to_notification", app.AddToNotification) // Добавление в заявку
 
 	// Заявки - уведомления
-	r.GET("/notifications", app.GetAllNotifications)                                                       // Список (отфильтровать по дате формирования и статусу)
-	r.GET("/notifications/:notification_id", app.GetNotification)                                          // Одна заявка
-	r.PUT("/notifications/:notification_id/update", app.UpdateNotification)                                // Изменение (добавление транспорта)
-	r.DELETE("/notifications/:notification_id", app.DeleteNotification)                             //Удаление
-	r.DELETE("/notifications/:notification_id/delete_recipient/:recipient_id", app.DeleteFromNotification) // Изменеие (удаление услуг)
-	r.PUT("/notifications/:notification_id/user_confirm", app.UserConfirm)                                 // Сформировать создателем
-	r.PUT("notifications/:notification_id/moderator_confirm", app.ModeratorConfirm)                        // Завершить отклонить модератором
+	r.GET("/api/notifications", app.GetAllNotifications)                                                       // Список (отфильтровать по дате формирования и статусу)
+	r.GET("/api/notifications/:notification_id", app.GetNotification)                                          // Одна заявка
+	r.PUT("/api/notifications/:notification_id/update", app.UpdateNotification)                                // Изменение (добавление транспорта)
+	r.DELETE("/api/notifications/:notification_id", app.DeleteNotification)                             //Удаление
+	r.DELETE("/api/notifications/:notification_id/delete_recipient/:recipient_id", app.DeleteFromNotification) // Изменеие (удаление услуг)
+	r.PUT("/api/notifications/:notification_id/user_confirm", app.UserConfirm)                                 // Сформировать создателем
+	r.PUT("/api/notifications/:notification_id/moderator_confirm", app.ModeratorConfirm)                        // Завершить отклонить модератором
 
 	r.Static("/image", "./resources")
 	r.Static("/css", "./static/css")

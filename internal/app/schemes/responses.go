@@ -46,18 +46,18 @@ func ConvertNotification(notification *ds.Notification) NotificationOutput {
 	output := NotificationOutput{
 		UUID:         notification.UUID,
 		Status:       notification.Status,
-		CreationDate: notification.CreationDate.Format("2006-01-02"),
+		CreationDate: notification.CreationDate.Format("2006-01-02 15:04:05"),
 		NotificationType:    notification.NotificationType,
 		Customer:     notification.Customer.Name,
 	}
 
 	if notification.FormationDate != nil {
-		formationDate := notification.FormationDate.Format("2006-01-02")
+		formationDate := notification.FormationDate.Format("2006-01-02 15:04:05")
 		output.FormationDate = &formationDate
 	}
 
 	if notification.CompletionDate != nil {
-		completionDate := notification.CompletionDate.Format("2006-01-02")
+		completionDate := notification.CompletionDate.Format("2006-01-02 15:04:05")
 		output.CompletionDate = &completionDate
 	}
 
