@@ -56,24 +56,8 @@ INSERT INTO "recipients" ("uuid", "fio", "image_url", "email", "age", "adress", 
 ('9b8914a6-c599-450d-893d-b8ebb766dd07',	'Кирилл Лейка Кириллович',	'localhost:9000/images/men4.jpg',	'KriLeik@mail.ru',	30,	'Москва, ул. Бутовская, д.15, кв.79',	'f'),
 ('b06a0b5a-6ede-4636-a97b-83976dc10575',	'Андрей Ермолин Данилович',	'localhost:9000/images/men5.jpg',	'andrErm@gmail.com',	33,	'Москва, ул. Клинская, д.22, кв.12',	'f');
 
-DROP TABLE IF EXISTS "users";
-CREATE TABLE "public"."users" (
-    "uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
-    "login" character varying(30) NOT NULL,
-    "password" character varying(30) NOT NULL,
-    "name" character varying(50) NOT NULL,
-    "moderator" boolean NOT NULL,
-    CONSTRAINT "users_pkey" PRIMARY KEY ("uuid")
-) WITH (oids = false);
-
-INSERT INTO "users" ("uuid", "login", "password", "name", "moderator") VALUES
-('2d217868-ab6d-41fe-9b34-7809083a2e8a',	'user 1',	'pass 1',	'Пользователь',	'f'),
-('87d54d58-1e24-4cca-9c83-bd2523902729',	'user 2',	'pass 2',	'Модератор',	't');
 
 ALTER TABLE ONLY "public"."notification_contents" ADD CONSTRAINT "fk_notification_contents_notification" FOREIGN KEY (notification_id) REFERENCES notifications(uuid) NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."notification_contents" ADD CONSTRAINT "fk_notification_contents_recipient" FOREIGN KEY (recipient_id) REFERENCES recipients(uuid) NOT DEFERRABLE;
-
-ALTER TABLE ONLY "public"."notifications" ADD CONSTRAINT "fk_notifications_customer" FOREIGN KEY (customer_id) REFERENCES users(uuid) NOT DEFERRABLE;
-ALTER TABLE ONLY "public"."notifications" ADD CONSTRAINT "fk_notifications_moderator" FOREIGN KEY (moderator_id) REFERENCES users(uuid) NOT DEFERRABLE;
 
 -- 2023-12-04 21:08:38.415951+00
