@@ -19,7 +19,7 @@ type GetAllRecipientsRequest struct {
 // вопрос
 type AddRecipientRequest struct {
 	ds.Recipient
-	Image *multipart.FileHeader `form:"image" json:"image" binding:"required"`
+	Image *multipart.FileHeader `form:"image" json:"image"`
 }
 
 type ChangeRecipientRequest struct {
@@ -58,12 +58,15 @@ type DeleteFromNotificationRequest struct {
 }
 
 type UserConfirmRequest struct {
-	NotificationId string `uri:"notification_id" binding:"required,uuid"`
+	URI struct {
+		NotificationId string `uri:"notification_id" binding:"required,uuid"`
+	}
+	Confirm bool `form:"confirm" binding:"required"`
 }
 
 type ModeratorConfirmRequest struct {
 	URI struct {
 		NotificationId string `uri:"notification_id" binding:"required,uuid"`
 	}
-	Status string `form:"status" json:"status" binding:"required"`
+	Confirm bool `form:"confirm" binding:"required"`
 }
