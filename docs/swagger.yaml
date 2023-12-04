@@ -1,0 +1,480 @@
+basePath: /
+definitions:
+  app.SwaggerUpdateNotificationRequest:
+    properties:
+      notification_type:
+        type: string
+    type: object
+  ds.Recipient:
+    properties:
+      adress:
+        type: string
+      age:
+        type: integer
+      email:
+        type: string
+      fio:
+        type: string
+      image_url:
+        type: string
+      uuid:
+        type: string
+    required:
+    - adress
+    - age
+    - email
+    - fio
+    type: object
+  schemes.AllNotificationsResponse:
+    properties:
+      notifications:
+        items:
+          $ref: '#/definitions/schemes.NotificationOutput'
+        type: array
+    type: object
+  schemes.AllRecipientsResponse:
+    properties:
+      recipients:
+        items:
+          $ref: '#/definitions/ds.Recipient'
+        type: array
+    type: object
+  schemes.GetAllRecipientsResponse:
+    properties:
+      draft_notification:
+        $ref: '#/definitions/schemes.NotificationShort'
+      recipients:
+        items:
+          $ref: '#/definitions/ds.Recipient'
+        type: array
+    type: object
+  schemes.LoginReq:
+    properties:
+      login:
+        maxLength: 30
+        type: string
+      password:
+        maxLength: 30
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  schemes.NotificationOutput:
+    properties:
+      completion_date:
+        type: string
+      creation_date:
+        type: string
+      customer:
+        type: string
+      formation_date:
+        type: string
+      moderator:
+        type: string
+      notification_type:
+        type: string
+      status:
+        type: string
+      uuid:
+        type: string
+    type: object
+  schemes.NotificationResponse:
+    properties:
+      notification:
+        $ref: '#/definitions/schemes.NotificationOutput'
+      recipients:
+        items:
+          $ref: '#/definitions/ds.Recipient'
+        type: array
+    type: object
+  schemes.NotificationShort:
+    properties:
+      recipient_count:
+        type: integer
+      uuid:
+        type: string
+    type: object
+  schemes.RegisterReq:
+    properties:
+      login:
+        maxLength: 30
+        type: string
+      password:
+        maxLength: 30
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  schemes.RegisterResp:
+    properties:
+      ok:
+        type: boolean
+    type: object
+  schemes.UpdateNotificationResponse:
+    properties:
+      notifications:
+        $ref: '#/definitions/schemes.NotificationOutput'
+    type: object
+host: 127.0.0.1:8080
+info:
+  contact: {}
+  title: Electronic notifications
+  version: "1.0"
+paths:
+  /api/notifications:
+    get:
+      description: Возвращает все уведомления с фильтрацией по статусу и дате формирования
+      parameters:
+      - description: статус уведомления
+        in: query
+        name: status
+        type: string
+      - description: начальная дата формирования
+        in: query
+        name: formation_date_start
+        type: string
+      - description: конечная дата формирвания
+        in: query
+        name: formation_date_end
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.AllNotificationsResponse'
+      summary: Получить все уведомления
+      tags:
+      - Уведомления
+  /api/notifications/{notification_id}:
+    delete:
+      description: Удаляет уведомление по id
+      parameters:
+      - description: id уведомления
+        in: path
+        name: notification_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Удалить уведомление
+      tags:
+      - Уведомления
+    get:
+      description: Возвращает подробную информацию об уведомлении и его типе
+      parameters:
+      - description: id уведомления
+        in: path
+        name: notification_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.NotificationResponse'
+      summary: Получить одно уведомление
+      tags:
+      - Уведомления
+    put:
+      description: Позволяет изменить тип уведомления и возвращает обновлённые данные
+      parameters:
+      - description: id уведомления
+        in: path
+        name: notification_id
+        required: true
+        type: string
+      - description: Тип уведомления
+        in: body
+        name: notification_type
+        required: true
+        schema:
+          $ref: '#/definitions/app.SwaggerUpdateNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.UpdateNotificationResponse'
+      summary: Указать тип уведомления
+      tags:
+      - Уведомления
+  /api/notifications/{notification_id}/delete_recipient/{recipient_id}:
+    delete:
+      description: Удалить получателя из уведомления
+      parameters:
+      - description: id уведомления
+        in: path
+        name: notification_id
+        required: true
+        type: string
+      - description: id получателя
+        in: path
+        name: recipient_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.AllRecipientsResponse'
+      summary: Удалить получателя из уведомления
+      tags:
+      - Уведомления
+  /api/notifications/{notification_id}/moderator_confirm:
+    put:
+      description: Подтвердить или отменить уведомление модератором
+      parameters:
+      - description: id уведомления
+        in: path
+        name: notification_id
+        required: true
+        type: string
+      - description: подтвердить
+        in: body
+        name: confirm
+        required: true
+        schema:
+          type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Подтвердить уведомление
+      tags:
+      - Уведомления
+  /api/notifications/user_confirm:
+    put:
+      description: Сформировать или удалить уведомление пользователем
+      parameters:
+      - description: id уведомления
+        in: path
+        name: notification_id
+        required: true
+        type: string
+      - description: подтвердить
+        in: body
+        name: confirm
+        required: true
+        schema:
+          type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Сформировать уведомление
+      tags:
+      - Уведомления
+  /api/recipients:
+    get:
+      description: Возвращает всех доуступных получателей с опциональной фильтрацией
+        по ФИО
+      parameters:
+      - description: ФИО для фильтрации
+        in: query
+        name: fio
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.GetAllRecipientsResponse'
+      summary: Получить всех получателей
+      tags:
+      - Получатели
+  /api/recipients/:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Добавить нового получателя
+      parameters:
+      - description: Изображение получателя
+        in: formData
+        name: image
+        type: file
+      - description: ФИО
+        in: formData
+        name: fio
+        required: true
+        type: string
+      - description: Почта
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: Возраст
+        in: formData
+        name: age
+        required: true
+        type: integer
+      - description: Адрес
+        in: formData
+        name: adress
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Добавить получателя
+      tags:
+      - Получатели
+  /api/recipients/{recipient_id}:
+    delete:
+      description: Удаляет получателя по id
+      parameters:
+      - description: id получателя
+        in: path
+        name: recipient_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Удалить получателя
+      tags:
+      - Получатели
+    get:
+      description: Возвращает более подробную информацию об одном получателе
+      parameters:
+      - description: id получателя
+        in: path
+        name: recipient_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ds.Recipient'
+      summary: Получить одного получателя
+      tags:
+      - Получатели
+    put:
+      consumes:
+      - multipart/form-data
+      description: Изменить данные полей о получателе
+      parameters:
+      - description: Идентификатор получателя
+        in: path
+        name: recipient_id
+        required: true
+        type: string
+      - description: ФИО
+        in: formData
+        name: fio
+        type: string
+      - description: Почта
+        in: formData
+        name: email
+        type: string
+      - description: Возраст
+        in: formData
+        name: age
+        type: integer
+      - description: Изображение получателя
+        in: formData
+        name: image
+        type: file
+      - description: Адрес
+        in: formData
+        name: adress
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Изменить получателя
+      tags:
+      - Получатели
+  /api/recipients/{recipient_id}/add_to_notification:
+    post:
+      description: Добавить выбранного получателя в черновик уведомления
+      parameters:
+      - description: id получателя
+        in: path
+        name: recipient_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.AllRecipientsResponse'
+      summary: Добавить в уведомление
+      tags:
+      - Получатели
+  /api/user/login:
+    post:
+      consumes:
+      - application/json
+      description: Авторизует пользователя по логиню, паролю и отдаёт jwt токен для
+        дальнейших запросов
+      parameters:
+      - description: login and password
+        in: body
+        name: user_credentials
+        required: true
+        schema:
+          $ref: '#/definitions/schemes.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Авторизация
+      tags:
+      - Авторизация
+  /api/user/loguot:
+    post:
+      consumes:
+      - application/json
+      description: Выход из аккаунта
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Выйти из аккаунта
+      tags:
+      - Авторизация
+  /api/user/sign_up:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация нового пользователя
+      parameters:
+      - description: login and password
+        in: body
+        name: user_credentials
+        required: true
+        schema:
+          $ref: '#/definitions/schemes.RegisterReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.RegisterResp'
+      summary: Регистрация
+      tags:
+      - Авторизация
+schemes:
+- http
+swagger: "2.0"

@@ -2,6 +2,7 @@ package schemes
 
 import (
 	"R_I_P_labs/internal/app/ds"
+	"time"
 )
 
 type AllRecipientsResponse struct {
@@ -48,7 +49,7 @@ func ConvertNotification(notification *ds.Notification) NotificationOutput {
 		Status:       notification.Status,
 		CreationDate: notification.CreationDate.Format("2006-01-02 15:04:05"),
 		NotificationType:    notification.NotificationType,
-		Customer:     notification.Customer.Name,
+		Customer:     notification.Customer.Login,
 	}
 
 	if notification.FormationDate != nil {
@@ -62,8 +63,24 @@ func ConvertNotification(notification *ds.Notification) NotificationOutput {
 	}
 
 	if notification.Moderator != nil {
-		output.Moderator = &notification.Moderator.Name
+		output.Moderator = &notification.Moderator.Login
 	}
 
 	return output
+}
+
+type LoginResp struct {
+	ExpiresIn   time.Duration `json:"expires_in"`
+	AccessToken string        `json:"access_token"`
+	TokenType   string        `json:"token_type"`
+}
+
+type SwaggerLoginResp struct {
+	ExpiresIn   int64  `json:"expires_in"`
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
+}
+
+type RegisterResp struct {
+	Ok bool `json:"ok"`
 }

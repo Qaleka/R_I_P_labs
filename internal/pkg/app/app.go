@@ -1,8 +1,8 @@
 package app
 
 import (
+	"fmt"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,14 +11,20 @@ import (
 
 	"R_I_P_labs/internal/app/config"
 	"R_I_P_labs/internal/app/dsn"
+	"R_I_P_labs/internal/app/redis"
 	"R_I_P_labs/internal/app/repository"
+	"R_I_P_labs/internal/app/role"
+
+	"github.com/swaggo/files"       // swagger embed files
+	"github.com/swaggo/gin-swagger" // gin-swagger middleware
+	_ "R_I_P_labs/docs"
 )
 
 type Application struct {
 	repo        *repository.Repository
 	minioClient *minio.Client
 	config      *config.Config
-	// dsn string
+	redisClient *redis.Client
 }
 
 func (app *Application) Run() {
@@ -29,27 +35,46 @@ func (app *Application) Run() {
 	r.Use(ErrorHandler())
 
 	// Услуги - получатели
-	r.GET("/api/recipients", app.GetAllRecipients)                                     // Список с поиском
-	r.GET("/api/recipients/:recipient_id", app.GetRecipient)                           // Одна услуга
-	r.DELETE("/api/recipients/:recipient_id", app.DeleteRecipient)              // Удаление
-	r.PUT("/api/recipients/:recipient_id", app.ChangeRecipient)                 // Изменение
-	r.POST("/api/recipients", app.AddRecipient)                                    // Добавление
-	r.POST("/api/recipients/:recipient_id/add_to_notification", app.AddToNotification) // Добавление в заявку
+	api := r.Group("/api")
+	{
+		recipients := r.Group("/recipients")
+		{
+			recipients.GET("/", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetAllRecipients)                     // Список с поиском
+			recipients.GET("/:recipient_id", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetRecipient)            // Одна услуга
+			recipients.DELETE("/:recipient_id", app.WithAuthCheck(role.Moderator), app.DeleteRecipient)                         				// Удаление
+			recipients.PUT("/:recipient_id", app.WithAuthCheck(role.Moderator), app.ChangeRecipient)                            				// Изменение
+			recipients.POST("/", app.WithAuthCheck(role.Moderator), app.AddRecipient)                                           				// Добавление
+			recipients.POST("/:recipient_id/add_to_notification", app.WithAuthCheck(role.Moderator), app.AddToNotification) 					// Добавление в заявку
+		}
 
-	// Заявки - уведомления
-	r.GET("/api/notifications", app.GetAllNotifications)                                                       // Список (отфильтровать по дате формирования и статусу)
-	r.GET("/api/notifications/:notification_id", app.GetNotification)                                          // Одна заявка
-	r.PUT("/api/notifications/:notification_id/update", app.UpdateNotification)                                // Изменение (добавление транспорта)
-	r.DELETE("/api/notifications/:notification_id", app.DeleteNotification)                             //Удаление
-	r.DELETE("/api/notifications/:notification_id/delete_recipient/:recipient_id", app.DeleteFromNotification) // Изменеие (удаление услуг)
-	r.PUT("/api/notifications/:notification_id/user_confirm", app.UserConfirm)                                 // Сформировать создателем
-	r.PUT("/api/notifications/:notification_id/moderator_confirm", app.ModeratorConfirm)                        // Завершить отклонить модератором
+		// Заявки - уведомления
+		notifications := r.Group("/notifications")
+		{
+			notifications.GET("/", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllNotifications)                                         				  // Список (отфильтровать по дате формирования и статусу)
+			notifications.GET("/:notification_id",app.WithAuthCheck(role.Customer, role.Moderator),  app.GetNotification)                             				  // Одна заявка
+			notifications.PUT("/:notification_id/update", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateNotification)                                	  // Изменение (добавление транспорта)
+			notifications.DELETE("/:notification_id", app.WithAuthCheck(role.Moderator), app.DeleteNotification)                                      				  // Удаление
+			notifications.DELETE("/:notification_id/delete_recipient/:recipient_id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromNotification) 	  // Изменеие (удаление услуг)
+			notifications.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                                    				  // Сформировать создателем
+			notifications.PUT("/:notification_id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                         				  // Завершить отклонить модератором
+		}
 
-	r.Static("/image", "./resources")
-	r.Static("/css", "./static/css")
-	r.Run("localhost:7000") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
-	log.Println("Server down")
+		// Пользователи (авторизация)
+		user := api.Group("/user")
+		{
+			user.POST("/sign_up", app.Register)
+			user.POST("/login", app.Login)
+			user.POST("/logout", app.Logout)
+		}
+
+		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+		r.Run(fmt.Sprintf("%s:%d", app.config.ServiceHost, app.config.ServicePort))
+
+		log.Println("Server down")
+	}
 }
+
 
 func New() (*Application, error) {
 	var err error
@@ -66,7 +91,7 @@ func New() (*Application, error) {
 		return nil, err
 	}
 
-	app.minioClient, err = minio.New(app.config.MinioEndpoint, &minio.Options{
+	app.minioClient, err = minio.New(app.config.Minio.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4("", "", ""),
 		Secure: false,
 	})
@@ -74,28 +99,10 @@ func New() (*Application, error) {
 		return nil, err
 	}
 
-	return &app, nil
-}
-
-func ErrorHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Next()
-
-		for _, err := range c.Errors {
-			log.Println(err.Err)
-		}
-		lastError := c.Errors.Last()
-		if lastError != nil {
-			switch c.Writer.Status() {
-			case http.StatusBadRequest:
-				c.JSON(-1, gin.H{"error": "wrong request"})
-			case http.StatusNotFound:
-				c.JSON(-1, gin.H{"error": lastError.Error()})
-			case http.StatusMethodNotAllowed:
-				c.JSON(-1, gin.H{"error": lastError.Error()})
-			default:
-				c.Status(-1)
-			}
-		}
+	app.redisClient, err = redis.New(app.config.Redis)
+	if err != nil {
+		return nil, err
 	}
+
+	return &app, nil
 }

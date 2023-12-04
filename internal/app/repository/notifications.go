@@ -10,11 +10,15 @@ import (
 	"R_I_P_labs/internal/app/ds"
 )
 
-func (r *Repository) GetAllNotifications(formationDateStart, formationDateEnd *time.Time, status string) ([]ds.Notification, error) {
+func (r *Repository) GetAllNotifications(customerId *string, formationDateStart, formationDateEnd *time.Time, status string) ([]ds.Notification, error) {
 	var notifications []ds.Notification
 	query := r.db.Preload("Customer").Preload("Moderator").
 		Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
 		Where("status != ?", ds.DELETED)
+
+	if customerId != nil {
+		query = query.Where("customer_id = ?", *customerId)
+	}
 
 	if formationDateStart != nil && formationDateEnd != nil {
 		query = query.Where("formation_date BETWEEN ? AND ?", *formationDateStart, *formationDateEnd)
@@ -50,11 +54,12 @@ func (r *Repository) CreateDraftNotification(customerId string) (*ds.Notificatio
 	return notification, nil
 }
 
-func (r *Repository) GetNotificationById(notificationId, customerId string) (*ds.Notification, error) {
+func (r *Repository) GetNotificationById(notificationId, userId  string) (*ds.Notification, error) {
 	notification := &ds.Notification{}
 	err := r.db.Preload("Moderator").Preload("Customer").
 		Where("status != ?", ds.DELETED).
-		First(notification, ds.Notification{UUID: notificationId, CustomerId: customerId}).Error
+		Where("moderator_id = ? OR customer_id = ?", userId, userId).
+		First(notification, ds.Notification{UUID: notificationId}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil

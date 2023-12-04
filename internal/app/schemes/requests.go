@@ -58,9 +58,6 @@ type DeleteFromNotificationRequest struct {
 }
 
 type UserConfirmRequest struct {
-	URI struct {
-		NotificationId string `uri:"notification_id" binding:"required,uuid"`
-	}
 	Confirm bool `form:"confirm" binding:"required"`
 }
 
@@ -69,4 +66,14 @@ type ModeratorConfirmRequest struct {
 		NotificationId string `uri:"notification_id" binding:"required,uuid"`
 	}
 	Confirm bool `form:"confirm" binding:"required"`
+}
+
+type LoginReq struct {
+	Login    string `form:"login" binding:"required,max=30"`
+	Password string `form:"password" binding:"required,max=30"`
+}
+
+type RegisterReq struct {
+	Login    string `form:"login" binding:"required,max=30"`
+	Password string `form:"password" binding:"required,max=30"`
 }
