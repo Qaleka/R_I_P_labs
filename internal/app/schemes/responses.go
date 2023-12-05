@@ -69,6 +69,10 @@ func ConvertNotification(notification *ds.Notification) NotificationOutput {
 	return output
 }
 
+type AddToNotificationResp struct {
+	RecipientsCount int64 `json:"recipient_count"`
+}
+
 type LoginResp struct {
 	ExpiresIn   time.Duration `json:"expires_in"`
 	AccessToken string        `json:"access_token"`

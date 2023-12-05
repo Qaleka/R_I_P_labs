@@ -99,3 +99,14 @@ func (r *Repository) DeleteFromNotification(notificationId, recipientId string) 
 	}
 	return nil
 }
+
+func (r *Repository) CountRecipients(notificationId string) (int64, error) {
+	var count int64
+	err := r.db.Model(&ds.NotificationContent{}).
+		Where("notification_id = ?", notificationId).
+		Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}

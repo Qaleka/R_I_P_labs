@@ -149,6 +149,12 @@ func (app *Application) DeleteNotification(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("увдомление не найдено"))
 		return
 	}
+
+	userROle := getUserRole(c)
+	if userROle == role.Customer && notification.Status != ds.DRAFT {
+		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("уведомление уже сформировано"))
+		return
+	}
 	notification.Status = ds.DELETED
 
 	if err := app.repo.SaveNotification(notification); err != nil {
@@ -204,18 +210,9 @@ func (app *Application) DeleteFromNotification(c *gin.Context) {
 // @Summary		Сформировать уведомление
 // @Tags		Уведомления
 // @Description	Сформировать или удалить уведомление пользователем
-// @Produce		json
-// @Param		notification_id path string true "id уведомления"
-// @Param		confirm body boolean true "подтвердить"
 // @Success		200
 // @Router		/api/notifications/user_confirm [put]
 func (app *Application) UserConfirm(c *gin.Context) {
-	var request schemes.UserConfirmRequest
-	if err := c.ShouldBind(&request); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
 	userId := getUserId(c)
 	notification, err := app.repo.GetDraftNotification(userId)
 	if err != nil {
@@ -230,13 +227,9 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя сформировать уведомление со статусом %s", notification.Status))
 		return
 	}
-	if request.Confirm {
-		notification.Status = ds.FORMED
-		now := time.Now()
-		notification.FormationDate = &now
-	} else {
-		notification.Status = ds.DELETED
-	}
+	notification.Status = ds.FORMED
+	now := time.Now()
+	notification.FormationDate = &now
 
 	if err := app.repo.SaveNotification(notification); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -248,7 +241,6 @@ func (app *Application) UserConfirm(c *gin.Context) {
 // @Summary		Подтвердить уведомление
 // @Tags		Уведомления
 // @Description	Подтвердить или отменить уведомление модератором
-// @Produce		json
 // @Param		notification_id path string true "id уведомления"
 // @Param		confirm body boolean true "подтвердить"
 // @Success		200

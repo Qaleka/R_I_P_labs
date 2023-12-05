@@ -61,7 +61,7 @@ func (app *Application) Register(c *gin.Context) {
 // @Accept		json
 // @Produce		json
 // @Param		user_credentials body schemes.LoginReq true "login and password"
-// @Success		200
+// @Success		200 {object} schemes.SwaggerLoginResp
 // @Router		/api/user/login [post]
 // @Consumes    json
 func (app *Application) Login(c *gin.Context) {
@@ -104,13 +104,11 @@ func (app *Application) Login(c *gin.Context) {
 		return
 	}
 
-	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     "Authorization",
-		Value:    "Bearer " + strToken,
-		Expires:  time.Now().Add(JWTConfig.ExpiresIn),
-		HttpOnly: true,
+	c.JSON(http.StatusOK, schemes.LoginResp{
+		ExpiresIn:   JWTConfig.ExpiresIn,
+		AccessToken: strToken,
+		TokenType:   "Bearer",
 	})
-	c.Status(http.StatusOK)
 }
 
 // @Summary		Выйти из аккаунта

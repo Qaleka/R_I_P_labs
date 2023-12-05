@@ -42,12 +42,12 @@ func (app *Application) GetAllRecipients(c *gin.Context) {
 	response := schemes.GetAllRecipientsResponse{DraftNotification: nil, Recipients: recipients}
 	if draftNotification != nil {
 		response.DraftNotification = &schemes.NotificationShort{UUID: draftNotification.UUID}
-		containers, err := app.repo.GetNotificationContent(draftNotification.UUID)
+		recipientsCount, err := app.repo.CountRecipients(draftNotification.UUID)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		response.DraftNotification.RecipientCount = len(containers)
+		response.DraftNotification.RecipientCount = int(recipientsCount)
 	}
 	c.JSON(http.StatusOK, response)
 }
@@ -223,7 +223,7 @@ func (app *Application) ChangeRecipient(c *gin.Context) {
 // @Description	Добавить выбранного получателя в черновик уведомления
 // @Produce		json
 // @Param		recipient_id path string true "id получателя"
-// @Success		200 {object} schemes.AllRecipientsResponse
+// @Success		200 {object} schemes.AddToNotificationResp
 // @Router		/api/recipients/{recipient_id}/add_to_notification [post]
 func (app *Application) AddToNotification(c *gin.Context) {
 	var request schemes.AddToNotificationRequest
@@ -263,12 +263,11 @@ func (app *Application) AddToNotification(c *gin.Context) {
 		return
 	}
 
-	var recipients []ds.Recipient
-	recipients, err = app.repo.GetNotificationContent(notification.UUID)
+	recipientsCount, err := app.repo.CountRecipients(notification.UUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.AllRecipientsResponse{Recipients: recipients})
+	c.JSON(http.StatusOK, schemes.AddToNotificationResp{RecipientsCount: recipientsCount})
 }
