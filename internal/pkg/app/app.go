@@ -39,7 +39,7 @@ func (app *Application) Run() {
 	// Услуги - получатели
 	api := r.Group("/api")
 	{
-		recipients := r.Group("/recipients")
+		recipients := api.Group("/recipients")
 		{
 			recipients.GET("/", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetAllRecipients)                     // Список с поиском
 			recipients.GET("/:recipient_id", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetRecipient)            // Одна услуга
@@ -50,7 +50,7 @@ func (app *Application) Run() {
 		}
 
 		// Заявки - уведомления
-		notifications := r.Group("/notifications")
+		notifications := api.Group("/notifications")
 		{
 			notifications.GET("/", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllNotifications)                                         				  // Список (отфильтровать по дате формирования и статусу)
 			notifications.GET("/:notification_id",app.WithAuthCheck(role.Customer, role.Moderator),  app.GetNotification)                             				  // Одна заявка

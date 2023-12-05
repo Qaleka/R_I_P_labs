@@ -8,7 +8,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "127.0.0.1:8080",
+    "host": "127.0.0.1:80",
     "basePath": "/",
     "paths": {
         "/api/notifications": {
@@ -54,31 +54,10 @@
         "/api/notifications/user_confirm": {
             "put": {
                 "description": "Сформировать или удалить уведомление пользователем",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Уведомления"
                 ],
                 "summary": "Сформировать уведомление",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id уведомления",
-                        "name": "notification_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "подтвердить",
-                        "name": "confirm",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -211,9 +190,6 @@
         "/api/notifications/{notification_id}/moderator_confirm": {
             "put": {
                 "description": "Подтвердить или отменить уведомление модератором",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Уведомления"
                 ],
@@ -450,7 +426,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemes.AllRecipientsResponse"
+                            "$ref": "#/definitions/schemes.AddToNotificationResp"
                         }
                     }
                 }
@@ -482,7 +458,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.SwaggerLoginResp"
+                        }
                     }
                 }
             }
@@ -577,6 +556,14 @@
                 },
                 "uuid": {
                     "type": "string"
+                }
+            }
+        },
+        "schemes.AddToNotificationResp": {
+            "type": "object",
+            "properties": {
+                "recipient_count": {
+                    "type": "integer"
                 }
             }
         },
@@ -709,6 +696,20 @@
             "properties": {
                 "ok": {
                     "type": "boolean"
+                }
+            }
+        },
+        "schemes.SwaggerLoginResp": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "integer"
+                },
+                "token_type": {
+                    "type": "string"
                 }
             }
         },

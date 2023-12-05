@@ -25,6 +25,11 @@ definitions:
     - email
     - fio
     type: object
+  schemes.AddToNotificationResp:
+    properties:
+      recipient_count:
+        type: integer
+    type: object
   schemes.AllNotificationsResponse:
     properties:
       notifications:
@@ -112,12 +117,21 @@ definitions:
       ok:
         type: boolean
     type: object
+  schemes.SwaggerLoginResp:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      token_type:
+        type: string
+    type: object
   schemes.UpdateNotificationResponse:
     properties:
       notifications:
         $ref: '#/definitions/schemes.NotificationOutput'
     type: object
-host: 127.0.0.1:8080
+host: 127.0.0.1:80
 info:
   contact: {}
   title: Electronic notifications
@@ -245,8 +259,6 @@ paths:
         required: true
         schema:
           type: boolean
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -256,20 +268,6 @@ paths:
   /api/notifications/user_confirm:
     put:
       description: Сформировать или удалить уведомление пользователем
-      parameters:
-      - description: id уведомления
-        in: path
-        name: notification_id
-        required: true
-        type: string
-      - description: подтвердить
-        in: body
-        name: confirm
-        required: true
-        schema:
-          type: boolean
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -415,7 +413,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schemes.AllRecipientsResponse'
+            $ref: '#/definitions/schemes.AddToNotificationResp'
       summary: Добавить в уведомление
       tags:
       - Получатели
@@ -437,6 +435,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/schemes.SwaggerLoginResp'
       summary: Авторизация
       tags:
       - Авторизация

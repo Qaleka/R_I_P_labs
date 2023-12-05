@@ -58,31 +58,10 @@ const docTemplate = `{
         "/api/notifications/user_confirm": {
             "put": {
                 "description": "Сформировать или удалить уведомление пользователем",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Уведомления"
                 ],
                 "summary": "Сформировать уведомление",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id уведомления",
-                        "name": "notification_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "подтвердить",
-                        "name": "confirm",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -215,9 +194,6 @@ const docTemplate = `{
         "/api/notifications/{notification_id}/moderator_confirm": {
             "put": {
                 "description": "Подтвердить или отменить уведомление модератором",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Уведомления"
                 ],
@@ -454,7 +430,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemes.AllRecipientsResponse"
+                            "$ref": "#/definitions/schemes.AddToNotificationResp"
                         }
                     }
                 }
@@ -486,7 +462,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.SwaggerLoginResp"
+                        }
                     }
                 }
             }
@@ -581,6 +560,14 @@ const docTemplate = `{
                 },
                 "uuid": {
                     "type": "string"
+                }
+            }
+        },
+        "schemes.AddToNotificationResp": {
+            "type": "object",
+            "properties": {
+                "recipient_count": {
+                    "type": "integer"
                 }
             }
         },
@@ -716,6 +703,20 @@ const docTemplate = `{
                 }
             }
         },
+        "schemes.SwaggerLoginResp": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "integer"
+                },
+                "token_type": {
+                    "type": "string"
+                }
+            }
+        },
         "schemes.UpdateNotificationResponse": {
             "type": "object",
             "properties": {
@@ -730,7 +731,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "127.0.0.1:8080",
+	Host:             "127.0.0.1:80",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "Electronic notifications",
