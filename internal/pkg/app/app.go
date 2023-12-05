@@ -46,7 +46,7 @@ func (app *Application) Run() {
 			recipients.DELETE("/:recipient_id", app.WithAuthCheck(role.Moderator), app.DeleteRecipient)                         				// Удаление
 			recipients.PUT("/:recipient_id", app.WithAuthCheck(role.Moderator), app.ChangeRecipient)                            				// Изменение
 			recipients.POST("/", app.WithAuthCheck(role.Moderator), app.AddRecipient)                                           				// Добавление
-			recipients.POST("/:recipient_id/add_to_notification", app.WithAuthCheck(role.Moderator), app.AddToNotification) 					// Добавление в заявку
+			recipients.POST("/:recipient_id/add_to_notification", app.WithAuthCheck(role.Customer,role.Moderator), app.AddToNotification) 					// Добавление в заявку
 		}
 
 		// Заявки - уведомления
@@ -55,7 +55,7 @@ func (app *Application) Run() {
 			notifications.GET("/", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllNotifications)                                         				  // Список (отфильтровать по дате формирования и статусу)
 			notifications.GET("/:notification_id",app.WithAuthCheck(role.Customer, role.Moderator),  app.GetNotification)                             				  // Одна заявка
 			notifications.PUT("/:notification_id/update", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateNotification)                                	  // Изменение (добавление транспорта)
-			notifications.DELETE("/:notification_id", app.WithAuthCheck(role.Moderator), app.DeleteNotification)                                      				  // Удаление
+			notifications.DELETE("/:notification_id", app.WithAuthCheck(role.Customer,role.Moderator), app.DeleteNotification)                                      				  // Удаление
 			notifications.DELETE("/:notification_id/delete_recipient/:recipient_id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromNotification) 	  // Изменеие (удаление услуг)
 			notifications.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                                    				  // Сформировать создателем
 			notifications.PUT("/:notification_id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                         				  // Завершить отклонить модератором
