@@ -11,12 +11,10 @@ type RecipientRequest struct {
 	RecipientId string `uri:"recipient_id" binding:"required,uuid"`
 }
 
-// вопрос
 type GetAllRecipientsRequest struct {
 	FIO string `form:"fio"`
 }
 
-// вопрос
 type AddRecipientRequest struct {
 	ds.Recipient
 	Image *multipart.FileHeader `form:"image" json:"image"`
