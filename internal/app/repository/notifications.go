@@ -92,8 +92,8 @@ func (r *Repository) SaveNotification(notification *ds.Notification) error {
 	return nil
 }
 
-func (r *Repository) DeleteFromNotification(notificationId, recipientId string) error {
-	err := r.db.Delete(&ds.NotificationContent{NotificationId: notificationId, RecipientId: recipientId}).Error
+func (r *Repository) DeleteFromNotification(notificationId, RecipientId string) error {
+	err := r.db.Delete(&ds.NotificationContent{NotificationId: notificationId, RecipientId: RecipientId}).Error
 	if err != nil {
 		return err
 	}
