@@ -54,12 +54,14 @@ func (r *Repository) CreateDraftNotification(customerId string) (*ds.Notificatio
 	return notification, nil
 }
 
-func (r *Repository) GetNotificationById(notificationId, userId  string) (*ds.Notification, error) {
+func (r *Repository) GetNotificationById(notificationId string, userId  *string) (*ds.Notification, error) {
 	notification := &ds.Notification{}
-	err := r.db.Preload("Moderator").Preload("Customer").
-		Where("status != ?", ds.DELETED).
-		Where("moderator_id = ? OR customer_id = ?", userId, userId).
-		First(notification, ds.Notification{UUID: notificationId}).Error
+	query := r.db.Preload("Moderator").Preload("Customer").
+		Where("status != ?", ds.DELETED)
+	if userId != nil {
+		query = query.Where("customer_id = ?", userId)
+	}
+	err := query.First(notification, ds.Notification{UUID: notificationId}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil

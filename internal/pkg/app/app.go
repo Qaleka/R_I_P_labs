@@ -46,7 +46,7 @@ func (app *Application) Run() {
 			recipients.DELETE("/:recipient_id", app.WithAuthCheck(role.Moderator), app.DeleteRecipient)                         				// Удаление
 			recipients.PUT("/:recipient_id", app.WithAuthCheck(role.Moderator), app.ChangeRecipient)                            				// Изменение
 			recipients.POST("/", app.WithAuthCheck(role.Moderator), app.AddRecipient)                                           				// Добавление
-			recipients.POST("/:recipient_id/add_to_notification", app.WithAuthCheck(role.Customer,role.Moderator), app.AddToNotification) 					// Добавление в заявку
+			recipients.POST("/:recipient_id/add_to_notification", app.WithAuthCheck(role.Customer,role.Moderator), app.AddToNotification) 		// Добавление в заявку
 		}
 
 		// Заявки - уведомления

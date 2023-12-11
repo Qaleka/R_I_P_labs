@@ -60,13 +60,20 @@ func (app *Application) GetAllNotifications(c *gin.Context) {
 // @Router		/api/notifications/{notification_id} [get]
 func (app *Application) GetNotification(c *gin.Context) {
 	var request schemes.NotificationRequest
+	var err error
 	if err := c.ShouldBindUri(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
 	userId := getUserId(c)
-	notification, err := app.repo.GetNotificationById(request.NotificationId, userId)
+	userRole := getUserRole(c)
+	var notification *ds.Notification
+	if userRole == role.Moderator {
+		notification, err = app.repo.GetNotificationById(request.NotificationId, nil)
+	} else {
+		notification, err = app.repo.GetNotificationById(request.NotificationId, &userId)
+	}
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -108,7 +115,7 @@ func (app *Application) UpdateNotification(c *gin.Context) {
 		return
 	}
 	userId := getUserId(c)
-	notification, err := app.repo.GetNotificationById(request.URI.NotificationId, userId)
+	notification, err := app.repo.GetNotificationById(request.URI.NotificationId, &userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -134,13 +141,20 @@ func (app *Application) UpdateNotification(c *gin.Context) {
 // @Router		/api/notifications/{notification_id} [delete]
 func (app *Application) DeleteNotification(c *gin.Context) {
 	var request schemes.NotificationRequest
+	var err error
 	if err := c.ShouldBindUri(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
 	userId := getUserId(c)
-	notification, err := app.repo.GetNotificationById(request.NotificationId,userId)
+	userRole := getUserRole(c)
+	var notification *ds.Notification
+	if userRole == role.Moderator {
+		notification, err = app.repo.GetNotificationById(request.NotificationId, nil)
+	} else {
+		notification, err = app.repo.GetNotificationById(request.NotificationId, &userId)
+	}
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -150,8 +164,7 @@ func (app *Application) DeleteNotification(c *gin.Context) {
 		return
 	}
 
-	userROle := getUserRole(c)
-	if userROle == role.Customer && notification.Status != ds.DRAFT {
+	if userRole == role.Customer && notification.Status != ds.DRAFT {
 		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("уведомление уже сформировано"))
 		return
 	}
@@ -174,12 +187,19 @@ func (app *Application) DeleteNotification(c *gin.Context) {
 // @Router		/api/notifications/{notification_id}/delete_recipient/{recipient_id} [delete]
 func (app *Application) DeleteFromNotification(c *gin.Context) {
 	var request schemes.DeleteFromNotificationRequest
+	var err error
 	if err := c.ShouldBindUri(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 	userId := getUserId(c)
-	notification, err := app.repo.GetNotificationById(request.NotificationId,userId)
+	userRole := getUserRole(c)
+	var notification *ds.Notification
+	if userRole == role.Moderator {
+		notification, err = app.repo.GetNotificationById(request.NotificationId, nil)
+	} else {
+		notification, err = app.repo.GetNotificationById(request.NotificationId, &userId)
+	}
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -257,7 +277,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 	}
 
 	userId := getUserId(c)
-	notification, err := app.repo.GetNotificationById(request.URI.NotificationId,userId)
+	notification, err := app.repo.GetNotificationById(request.URI.NotificationId,nil)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
