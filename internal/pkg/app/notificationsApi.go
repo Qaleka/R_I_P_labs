@@ -124,7 +124,7 @@ func (app *Application) UpdateNotification(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("уведомление не найдено"))
 		return
 	}
-	notification.NotificationType = request.NotificationType
+	notification.NotificationType = &request.NotificationType
 	if app.repo.SaveNotification(notification); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -164,11 +164,11 @@ func (app *Application) DeleteNotification(c *gin.Context) {
 		return
 	}
 
-	if userRole == role.Customer && notification.Status != ds.DRAFT {
+	if userRole == role.Customer && notification.Status != ds.StatusDraft  {
 		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("уведомление уже сформировано"))
 		return
 	}
-	notification.Status = ds.DELETED
+	notification.Status = ds.StatusDeleted
 
 	if err := app.repo.SaveNotification(notification); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -208,7 +208,7 @@ func (app *Application) DeleteFromNotification(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("уведомление не найдено"))
 		return
 	}
-	if notification.Status != ds.DRAFT {
+	if notification.Status != ds.StatusDraft  {
 		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя редактировать уведомление со статусом: %s", notification.Status))
 		return
 	}
@@ -230,7 +230,7 @@ func (app *Application) DeleteFromNotification(c *gin.Context) {
 // @Summary		Сформировать уведомление
 // @Tags		Уведомления
 // @Description	Сформировать или удалить уведомление пользователем
-// @Success		200
+// @Success		200 {object} schemes.NotificationOutput
 // @Router		/api/notifications/user_confirm [put]
 func (app *Application) UserConfirm(c *gin.Context) {
 	userId := getUserId(c)
@@ -243,11 +243,18 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("уведомление не найдено"))
 		return
 	}
-	if notification.Status != ds.DRAFT {
+	if notification.Status != ds.StatusDraft  {
 		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя сформировать уведомление со статусом %s", notification.Status))
 		return
 	}
-	notification.Status = ds.FORMED
+	if err := sendingRequest(notification.UUID); err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf(`sending service is unavailable: {%s}`, err))
+		return
+	}
+
+	sendingStatus := ds.SendingStarted
+	notification.SendingStatus = &sendingStatus
+	notification.Status = ds.StatusFormed
 	now := time.Now()
 	notification.FormationDate = &now
 
@@ -255,7 +262,7 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, schemes.ConvertNotification(notification))
 }
 
 // @Summary		Подтвердить уведомление
@@ -286,22 +293,67 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("уведомление не найдено"))
 		return
 	}
-	if notification.Status != ds.FORMED {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя изменить статус с \"%s\" на \"%s\"", notification.Status,  ds.FORMED))
+	if notification.Status != ds.StatusFormed  {
+		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя изменить статус с \"%s\" на \"%s\"", notification.Status,  ds.StatusFormed ))
 		return
 	}
 
 
 	if request.Confirm {
-		notification.Status = ds.COMPELTED
+		notification.Status = ds.StatusCompleted
 		now := time.Now()
 		notification.CompletionDate = &now
 	
 	} else {
-		notification.Status = ds.REJECTED
+		notification.Status = ds.StatusCompleted
 	}
 	notification.ModeratorId = &userId
 	
+	if err := app.repo.SaveNotification(notification); err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
+func (app *Application) Sending(c *gin.Context) {
+	var request schemes.SendingReq
+	if err := c.ShouldBindUri(&request.URI); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	if err := c.ShouldBind(&request); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	if request.Token != app.config.Token {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+
+	notification, err := app.repo.GetNotificationById(request.URI.NotificationId, nil)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	if notification == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("уведомление не найдено"))
+		return
+	}
+	if notification.Status != ds.StatusFormed || *notification.SendingStatus != ds.SendingStarted {
+		c.AbortWithStatus(http.StatusMethodNotAllowed)
+		return
+	}
+
+	var sendingStatus string
+	if request.SendingStatus {
+		sendingStatus = ds.SendingCompleted
+	} else {
+		sendingStatus = ds.SendingFailed
+	}
+	notification.SendingStatus = &sendingStatus
+
 	if err := app.repo.SaveNotification(notification); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

@@ -59,19 +59,7 @@ services:
     volumes:
       - redis-data:/data
 
-  # http://localhost:8001/
-  # host: redis
-  # port: 6379
-  # name: whatever
-  redisinsight:
-    image: redislabs/redisinsight:latest
-    container_name: redisInsight
-    ports:
-      - '8001:8001'
-    volumes:
-      - redisinsight:/db 
-    depends_on:
-      - redis
+  
 
 volumes:
   data1-1:
@@ -79,4 +67,3 @@ volumes:
   data2-1:
   data2-2:
   redis-data:
-  redisinsight:

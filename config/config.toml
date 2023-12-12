@@ -1,5 +1,7 @@
 ServiceHost = "0.0.0.0"
-ServicePort = 80 
+ServicePort = 80
+Token = "secret_token"
+
 [minio]
 Endpoint = "localhost:9000"
 BucketName = "images"

@@ -40,7 +40,8 @@ type NotificationOutput struct {
 	CompletionDate *string `json:"completion_date"`
 	Moderator      *string `json:"moderator"`
 	Customer       string  `json:"customer"`
-	NotificationType      string  `json:"notification_type"`
+	NotificationType      *string  `json:"notification_type"`
+	SendingStatus *string `json:"sending_status"`
 }
 
 func ConvertNotification(notification *ds.Notification) NotificationOutput {
@@ -49,6 +50,7 @@ func ConvertNotification(notification *ds.Notification) NotificationOutput {
 		Status:       notification.Status,
 		CreationDate: notification.CreationDate.Format("2006-01-02 15:04:05"),
 		NotificationType:    notification.NotificationType,
+		SendingStatus: notification.SendingStatus,
 		Customer:     notification.Customer.Login,
 	}
 

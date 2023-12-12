@@ -75,3 +75,11 @@ type RegisterReq struct {
 	Login    string `form:"login" binding:"required,max=30"`
 	Password string `form:"password" binding:"required,max=30"`
 }
+
+type SendingReq struct {
+	URI struct {
+		NotificationId string `uri:"notification_id" binding:"required,uuid"`
+	}
+	SendingStatus bool `form:"sending_status" binding:"required"`
+	Token string `form:"token" binding:"required"`
+}

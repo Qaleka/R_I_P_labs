@@ -5,17 +5,21 @@ import (
 	"time"
 )
 
-const DRAFT string = "черновик"
-const FORMED string = "сформирован"
-const COMPELTED string = "завершён"
-const REJECTED string = "отклонён"
-const DELETED string = "удалён"
+const StatusDraft string = "черновик"
+const StatusFormed string = "сформирован"
+const StatusCompleted string = "завершён"
+const StatusRejected string = "отклонён"
+const StatusDeleted string = "удалён"
+
+const SendingCompleted string = "отправлено"
+const SendingFailed string = "отправка отменена"
+const SendingStarted string = "отправка начата"
 
 type User struct {
-	UUID      string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"-"`
-	Role      role.Role `sql:"type:string;"`
-	Login     string    `gorm:"size:30;not null" json:"login"`
-	Password  string    `gorm:"size:40;not null" json:"-"`
+	UUID     string `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"-"`
+	Role     role.Role
+	Login    string `gorm:"size:30;not null" json:"login"`
+	Password string `gorm:"size:40;not null" json:"-"`
 	// The SHA-1 hash is 20 bytes. When encoded in hexadecimal, each byte is represented by two characters. Therefore, the resulting hash string will be 40 characters long
 }
 
@@ -37,7 +41,8 @@ type Notification struct {
 	CompletionDate   *time.Time `gorm:"type:timestamp"`
 	ModeratorId      *string    `json:"-"`
 	CustomerId       string     `gorm:"not null"`
-	NotificationType string     `gorm:"size:50;not null"`
+	NotificationType *string     `gorm:"size:50"`
+	SendingStatus *string    `gorm:"size:40"`
 
 	Moderator *User
 	Customer  User

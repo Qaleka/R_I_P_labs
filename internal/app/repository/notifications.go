@@ -14,7 +14,7 @@ func (r *Repository) GetAllNotifications(customerId *string, formationDateStart,
 	var notifications []ds.Notification
 	query := r.db.Preload("Customer").Preload("Moderator").
 		Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
-		Where("status != ?", ds.DELETED)
+		Where("status != ? AND status != ?", ds.StatusDeleted, ds.StatusDraft)
 
 	if customerId != nil {
 		query = query.Where("customer_id = ?", *customerId)
@@ -35,7 +35,7 @@ func (r *Repository) GetAllNotifications(customerId *string, formationDateStart,
 
 func (r *Repository) GetDraftNotification(customerId string) (*ds.Notification, error) {
 	notification := &ds.Notification{}
-	err := r.db.First(notification, ds.Notification{Status: ds.DRAFT, CustomerId: customerId}).Error
+	err := r.db.First(notification, ds.Notification{Status: ds.StatusDraft, CustomerId: customerId}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -46,7 +46,7 @@ func (r *Repository) GetDraftNotification(customerId string) (*ds.Notification, 
 }
 
 func (r *Repository) CreateDraftNotification(customerId string) (*ds.Notification, error) {
-	notification := &ds.Notification{CreationDate: time.Now(), CustomerId: customerId, Status: ds.DRAFT}
+	notification := &ds.Notification{CreationDate: time.Now(), CustomerId: customerId, Status: ds.StatusDraft}
 	err := r.db.Create(notification).Error
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (r *Repository) CreateDraftNotification(customerId string) (*ds.Notificatio
 func (r *Repository) GetNotificationById(notificationId string, userId  *string) (*ds.Notification, error) {
 	notification := &ds.Notification{}
 	query := r.db.Preload("Moderator").Preload("Customer").
-		Where("status != ?", ds.DELETED)
+		Where("status != ?", ds.StatusDeleted)
 	if userId != nil {
 		query = query.Where("customer_id = ?", userId)
 	}
