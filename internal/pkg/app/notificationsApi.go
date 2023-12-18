@@ -305,7 +305,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		notification.CompletionDate = &now
 	
 	} else {
-		notification.Status = ds.StatusCompleted
+		notification.Status = ds.StatusRejected
 	}
 	notification.ModeratorId = &userId
 	
