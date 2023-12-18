@@ -299,7 +299,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 	}
 
 
-	if request.Confirm {
+	if *request.Confirm {
 		notification.Status = ds.StatusCompleted
 		now := time.Now()
 		notification.CompletionDate = &now
@@ -326,6 +326,7 @@ func (app *Application) Sending(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
+	fmt.Println(request, app.config.Token)
 
 	if request.Token != app.config.Token {
 		c.AbortWithStatus(http.StatusForbidden)
@@ -341,13 +342,13 @@ func (app *Application) Sending(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("уведомление не найдено"))
 		return
 	}
-	if notification.Status != ds.StatusFormed || *notification.SendingStatus != ds.SendingStarted {
-		c.AbortWithStatus(http.StatusMethodNotAllowed)
-		return
-	}
+	// if notification.Status != ds.StatusFormed || *notification.SendingStatus != ds.SendingStarted {
+	// 	c.AbortWithStatus(http.StatusMethodNotAllowed)
+	// 	return
+	// }
 
 	var sendingStatus string
-	if request.SendingStatus {
+	if *request.SendingStatus {
 		sendingStatus = ds.SendingCompleted
 	} else {
 		sendingStatus = ds.SendingFailed

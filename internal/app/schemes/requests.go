@@ -55,15 +55,11 @@ type DeleteFromNotificationRequest struct {
 	RecipientId    string `uri:"recipient_id" binding:"required,uuid"`
 }
 
-type UserConfirmRequest struct {
-	Confirm bool `form:"confirm" binding:"required"`
-}
-
 type ModeratorConfirmRequest struct {
 	URI struct {
 		NotificationId string `uri:"notification_id" binding:"required,uuid"`
 	}
-	Confirm bool `form:"confirm" binding:"required"`
+	Confirm *bool `form:"confirm" binding:"required"`
 }
 
 type LoginReq struct {
@@ -80,6 +76,6 @@ type SendingReq struct {
 	URI struct {
 		NotificationId string `uri:"notification_id" binding:"required,uuid"`
 	}
-	SendingStatus bool `form:"sending_status" binding:"required"`
-	Token string `form:"token" binding:"required"`
+	SendingStatus *bool `json:"sending_status" form:"sending_status" binding:"required"`
+	Token string `json:"token" form:"token" binding:"required"`
 }
