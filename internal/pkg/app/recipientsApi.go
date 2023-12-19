@@ -56,9 +56,9 @@ func (app *Application) GetAllRecipients(c *gin.Context) {
 // @Tags		Получатели
 // @Description	Возвращает более подробную информацию об одном получателе
 // @Produce		json
-// @Param		recipient_id path string true "id получателя"
+// @Param		id path string true "id получателя"
 // @Success		200 {object} ds.Recipient
-// @Router		/api/recipients/{recipient_id} [get]
+// @Router		/api/recipients/{id} [get]
 func (app *Application) GetRecipient(c *gin.Context) {
 	var request schemes.RecipientRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -81,9 +81,9 @@ func (app *Application) GetRecipient(c *gin.Context) {
 // @Summary		Удалить получателя
 // @Tags		Получатели
 // @Description	Удаляет получателя по id
-// @Param		recipient_id path string true "id получателя"
+// @Param		id path string true "id получателя"
 // @Success		200
-// @Router		/api/recipients/{recipient_id} [delete]
+// @Router		/api/recipients/{id} [delete]
 func (app *Application) DeleteRecipient(c *gin.Context) {
 	var request schemes.RecipientRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -102,9 +102,11 @@ func (app *Application) DeleteRecipient(c *gin.Context) {
 	}
 	recipient.ImageURL = nil
 	recipient.IsDeleted = true
-	if err := app.repo.SaveRecipient(recipient); err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
+	if recipient.ImageURL != nil {
+		if err := app.deleteImage(c, recipient.UUID); err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
 	}
 
 	c.Status(http.StatusOK)
@@ -120,7 +122,7 @@ func (app *Application) DeleteRecipient(c *gin.Context) {
 // @Param     	age formData int true "Возраст" format:"int"
 // @Param     	adress formData string true "Адрес" format:"string" maxLength:100
 // @Success		200
-// @Router		/api/recipients/ [post]
+// @Router		/api/recipients [post]
 func (app *Application) AddRecipient(c *gin.Context) {
 	var request schemes.AddRecipientRequest
 	if err := c.ShouldBind(&request); err != nil {
@@ -155,13 +157,13 @@ func (app *Application) AddRecipient(c *gin.Context) {
 // @Description	Изменить данные полей о получателе
 // @Accept		mpfd
 // @Produce		json
-// @Param		recipient_id path string true "Идентификатор получателя" format:"uuid"
+// @Param		id path string true "Идентификатор получателя" format:"uuid"
 // @Param		fio formData string false "ФИО" format:"string" maxLength:100
 // @Param		email formData string false "Почта" format:"string" maxLength:100
 // @Param		age formData int false "Возраст" format:"int"
 // @Param		image formData file false "Изображение получателя"
 // @Param		adress formData string false "Адрес" format:"string" maxLength:100
-// @Router		/api/recipients/{recipient_id} [put]
+// @Router		/api/recipients/{id} [put]
 func (app *Application) ChangeRecipient(c *gin.Context) {
 	var request schemes.ChangeRecipientRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -222,9 +224,9 @@ func (app *Application) ChangeRecipient(c *gin.Context) {
 // @Tags		Получатели
 // @Description	Добавить выбранного получателя в черновик уведомления
 // @Produce		json
-// @Param		recipient_id path string true "id получателя"
+// @Param		id path string true "id получателя"
 // @Success		200 {object} schemes.AddToNotificationResp
-// @Router		/api/recipients/{recipient_id}/add_to_notification [post]
+// @Router		/api/recipients/{id}/add_to_notification [post]
 func (app *Application) AddToNotification(c *gin.Context) {
 	var request schemes.AddToNotificationRequest
 	if err := c.ShouldBindUri(&request); err != nil {

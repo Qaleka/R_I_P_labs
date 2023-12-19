@@ -68,7 +68,7 @@ func generateHashString(s string) string {
 }
 
 func sendingRequest(notification_id string) error {
-	url := "http://localhost:8000/"
+	url := "http://localhost:8000/api/sending/"
 	payload := fmt.Sprintf(`{"notification_id": "%s"}`, notification_id)
 
 	resp, err := http.Post(url, "application/json", bytes.NewBufferString(payload))

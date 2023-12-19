@@ -8,7 +8,7 @@ import (
 )
 
 type RecipientRequest struct {
-	RecipientId string `uri:"recipient_id" binding:"required,uuid"`
+	RecipientId string `uri:"id" binding:"required,uuid"`
 }
 
 type GetAllRecipientsRequest struct {
@@ -21,7 +21,7 @@ type AddRecipientRequest struct {
 }
 
 type ChangeRecipientRequest struct {
-	RecipientId string                `uri:"recipient_id" binding:"required,uuid"`
+	RecipientId string                `uri:"id" binding:"required,uuid"`
 	FIO         *string               `form:"fio" json:"fio" binding:"omitempty,max=100"`
 	Email       *string               `form:"email" json:"email" binding:"omitempty,max=75"`
 	Age         *int                  `form:"age" json:"age"`
@@ -30,7 +30,7 @@ type ChangeRecipientRequest struct {
 }
 
 type AddToNotificationRequest struct {
-	RecipientId string `uri:"recipient_id" binding:"required,uuid"`
+	RecipientId string `uri:"id" binding:"required,uuid"`
 }
 
 type GetAllNotificationsRequst struct {
@@ -40,24 +40,20 @@ type GetAllNotificationsRequst struct {
 }
 
 type NotificationRequest struct {
-	NotificationId string `uri:"notification_id" binding:"required,uuid"`
+	NotificationId string `uri:"id" binding:"required,uuid"`
 }
 
 type UpdateNotificationRequest struct {
-	URI struct {
-		NotificationId string `uri:"notification_id" binding:"required,uuid"`
-	}
 	NotificationType string `form:"notification_type" json:"notification_type" binding:"required,max=50"`
 }
 
 type DeleteFromNotificationRequest struct {
-	NotificationId string `uri:"notification_id" binding:"required,uuid"`
-	RecipientId    string `uri:"recipient_id" binding:"required,uuid"`
+	RecipientId    string `uri:"id" binding:"required,uuid"`
 }
 
 type ModeratorConfirmRequest struct {
 	URI struct {
-		NotificationId string `uri:"notification_id" binding:"required,uuid"`
+		NotificationId string `uri:"id" binding:"required,uuid"`
 	}
 	Confirm *bool `form:"confirm" binding:"required"`
 }
@@ -74,7 +70,7 @@ type RegisterReq struct {
 
 type SendingReq struct {
 	URI struct {
-		NotificationId string `uri:"notification_id" binding:"required,uuid"`
+		NotificationId string `uri:"id" binding:"required,uuid"`
 	}
 	SendingStatus *bool `json:"sending_status" form:"sending_status" binding:"required"`
 	Token string `json:"token" form:"token" binding:"required"`

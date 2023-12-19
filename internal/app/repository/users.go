@@ -17,3 +17,12 @@ func (r *Repository) GetUserByLogin(login string) (*ds.User, error) {
 	return user, nil
 	
 }
+
+func (r *Repository) GetUserById(uuid string) (*ds.User, error) {
+	user := &ds.User{}
+	if err := r.db.Where("uuid = ?", uuid).
+		First(user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
+}

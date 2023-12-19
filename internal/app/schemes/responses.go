@@ -3,6 +3,7 @@ package schemes
 import (
 	"R_I_P_labs/internal/app/ds"
 	"time"
+	"fmt"
 )
 
 type AllRecipientsResponse struct {
@@ -65,7 +66,9 @@ func ConvertNotification(notification *ds.Notification) NotificationOutput {
 	}
 
 	if notification.Moderator != nil {
+		fmt.Println(notification.Moderator.Login)
 		output.Moderator = &notification.Moderator.Login
+		fmt.Println(*output.Moderator)
 	}
 
 	return output

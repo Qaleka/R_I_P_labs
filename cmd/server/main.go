@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-// TODO: change
+
 // @title Electronic notifications
 // @version 1.0
 

@@ -42,24 +42,24 @@ func (app *Application) Run() {
 		res := api.Group("/recipients")
 		{
 			res.GET("/", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetAllRecipients)                     // Список с поиском
-			res.GET("/:recipient_id", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetRecipient)            // Одна услуга
-			res.DELETE("/:recipient_id", app.WithAuthCheck(role.Moderator), app.DeleteRecipient)                         				// Удаление
-			res.PUT("/:recipient_id", app.WithAuthCheck(role.Moderator), app.ChangeRecipient)                            				// Изменение
-			res.POST("/", app.WithAuthCheck(role.Moderator), app.AddRecipient)                                           				// Добавление
-			res.POST("/:recipient_id/add_to_notification", app.WithAuthCheck(role.Customer,role.Moderator), app.AddToNotification) 		// Добавление в заявку
+			res.GET("/:id", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetRecipient)            // Одна услуга
+			res.DELETE("/:id", app.WithAuthCheck(role.Moderator), app.DeleteRecipient)                         				// Удаление
+			res.PUT("/:id", app.WithAuthCheck(role.Moderator), app.ChangeRecipient)                            				// Изменение
+			res.POST("", app.WithAuthCheck(role.Moderator), app.AddRecipient)                                           				// Добавление
+			res.POST("/:id/add_to_notification", app.WithAuthCheck(role.Customer,role.Moderator), app.AddToNotification) 		// Добавление в заявку
 		}
 
 		// Заявки - уведомления
 		n := api.Group("/notifications")
 		{
 			n.GET("/", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllNotifications)                                         				  // Список (отфильтровать по дате формирования и статусу)
-			n.GET("/:notification_id",app.WithAuthCheck(role.Customer, role.Moderator),  app.GetNotification)                             				  // Одна заявка
-			n.PUT("/:notification_id/update", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateNotification)                                	  // Изменение (добавление транспорта)
-			n.DELETE("/:notification_id", app.WithAuthCheck(role.Customer,role.Moderator), app.DeleteNotification)                                      				  // Удаление
-			n.DELETE("/:notification_id/delete_recipient/:recipient_id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromNotification) 	  // Изменеие (удаление услуг)
+			n.GET("/:id",app.WithAuthCheck(role.Customer, role.Moderator),  app.GetNotification)                             				  // Одна заявка
+			n.PUT("", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateNotification)                                	  // Изменение (добавление транспорта)
+			n.DELETE("", app.WithAuthCheck(role.Customer,role.Moderator), app.DeleteNotification)                                      				  // Удаление
+			n.DELETE("/delete_recipient/:id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromNotification) 	  // Изменеие (удаление услуг)
 			n.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                                    				  // Сформировать создателем
-			n.PUT("/:notification_id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                         				  // Завершить отклонить модератором
-			n.PUT("/:notification_id/sending", app.Sending)
+			n.PUT("/:id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                         				  // Завершить отклонить модератором
+			n.PUT("/:id/sending", app.Sending)
 		}
 
 		// Пользователи (авторизация)

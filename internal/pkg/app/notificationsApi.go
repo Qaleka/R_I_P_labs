@@ -55,9 +55,9 @@ func (app *Application) GetAllNotifications(c *gin.Context) {
 // @Tags		Уведомления
 // @Description	Возвращает подробную информацию об уведомлении и его типе
 // @Produce		json
-// @Param		notification_id path string true "id уведомления"
+// @Param		id path string true "id уведомления"
 // @Success		200 {object} schemes.NotificationResponse
-// @Router		/api/notifications/{notification_id} [get]
+// @Router		/api/notifications/{id} [get]
 func (app *Application) GetNotification(c *gin.Context) {
 	var request schemes.NotificationRequest
 	var err error
@@ -97,25 +97,24 @@ type SwaggerUpdateNotificationRequest struct {
 
 // @Summary		Указать тип уведомления
 // @Tags		Уведомления
-// @Description	Позволяет изменить тип уведомления и возвращает обновлённые данные
+// @Description	Позволяет изменить тип чернового уведомления и возвращает обновлённые данные
 // @Access		json
 // @Produce		json
-// @Param		notification_id path string true "id уведомления"
 // @Param		notification_type body SwaggerUpdateNotificationRequest true "Тип уведомления"
-// @Success		200 {object} schemes.UpdateNotificationResponse
-// @Router		/api/notifications/{notification_id} [put]
+// @Success		200 {object} schemes.NotificationOutput
+// @Router		/api/notifications [put]
 func (app *Application) UpdateNotification(c *gin.Context) {
 	var request schemes.UpdateNotificationRequest
-	if err := c.ShouldBindUri(&request.URI); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
+	var err error
 	if err := c.ShouldBind(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
+	// Получить черновую заявку
+	var notification *ds.Notification
+
 	userId := getUserId(c)
-	notification, err := app.repo.GetNotificationById(request.URI.NotificationId, &userId)
+	notification, err = app.repo.GetDraftNotification(userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -124,37 +123,28 @@ func (app *Application) UpdateNotification(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("уведомление не найдено"))
 		return
 	}
+
+	// Добавить тип
 	notification.NotificationType = &request.NotificationType
 	if app.repo.SaveNotification(notification); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.UpdateNotificationResponse{Notification:schemes.ConvertNotification(notification)})
+	c.JSON(http.StatusOK, schemes.ConvertNotification(notification))
 }
 
-// @Summary		Удалить уведомление
+// @Summary		Удалить черновое уведомление
 // @Tags		Уведомления
-// @Description	Удаляет уведомление по id
-// @Param		notification_id path string true "id уведомления"
+// @Description	Удаляет черновое уведомление
 // @Success		200
-// @Router		/api/notifications/{notification_id} [delete]
+// @Router		/api/notifications [delete]
 func (app *Application) DeleteNotification(c *gin.Context) {
-	var request schemes.NotificationRequest
 	var err error
-	if err := c.ShouldBindUri(&request); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	userId := getUserId(c)
-	userRole := getUserRole(c)
+	// Получить черновую заявку
 	var notification *ds.Notification
-	if userRole == role.Moderator {
-		notification, err = app.repo.GetNotificationById(request.NotificationId, nil)
-	} else {
-		notification, err = app.repo.GetNotificationById(request.NotificationId, &userId)
-	}
+	userId := getUserId(c)
+	notification, err = app.repo.GetDraftNotification(userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -164,10 +154,6 @@ func (app *Application) DeleteNotification(c *gin.Context) {
 		return
 	}
 
-	if userRole == role.Customer && notification.Status != ds.StatusDraft  {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("уведомление уже сформировано"))
-		return
-	}
 	notification.Status = ds.StatusDeleted
 
 	if err := app.repo.SaveNotification(notification); err != nil {
@@ -177,14 +163,13 @@ func (app *Application) DeleteNotification(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// @Summary		Удалить получателя из уведомления
+// @Summary		Удалить получателя из черновово уведомления
 // @Tags		Уведомления
-// @Description	Удалить получателя из уведомления
+// @Description	Удалить получателя из черновово уведомления
 // @Produce		json
-// @Param		notification_id path string true "id уведомления"
-// @Param		recipient_id path string true "id получателя"
+// @Param		id path string true "id получателя"
 // @Success		200 {object} schemes.AllRecipientsResponse
-// @Router		/api/notifications/{notification_id}/delete_recipient/{recipient_id} [delete]
+// @Router		/api/notifications/delete_recipient/{id} [delete]
 func (app *Application) DeleteFromNotification(c *gin.Context) {
 	var request schemes.DeleteFromNotificationRequest
 	var err error
@@ -192,14 +177,10 @@ func (app *Application) DeleteFromNotification(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	userId := getUserId(c)
-	userRole := getUserRole(c)
+	// Получить черновую заявку
 	var notification *ds.Notification
-	if userRole == role.Moderator {
-		notification, err = app.repo.GetNotificationById(request.NotificationId, nil)
-	} else {
-		notification, err = app.repo.GetNotificationById(request.NotificationId, &userId)
-	}
+	userId := getUserId(c)
+	notification, err = app.repo.GetDraftNotification(userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -208,17 +189,13 @@ func (app *Application) DeleteFromNotification(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("уведомление не найдено"))
 		return
 	}
-	if notification.Status != ds.StatusDraft  {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя редактировать уведомление со статусом: %s", notification.Status))
-		return
-	}
 
-	if err := app.repo.DeleteFromNotification(request.NotificationId, request.RecipientId); err != nil {
+	if err := app.repo.DeleteFromNotification(notification.UUID, request.RecipientId); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	recipients, err := app.repo.GetNotificationContent(request.NotificationId)
+	recipients, err := app.repo.GetNotificationContent(notification.UUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -229,7 +206,7 @@ func (app *Application) DeleteFromNotification(c *gin.Context) {
 
 // @Summary		Сформировать уведомление
 // @Tags		Уведомления
-// @Description	Сформировать или удалить уведомление пользователем
+// @Description	Сформировать уведомление пользователем
 // @Success		200 {object} schemes.NotificationOutput
 // @Router		/api/notifications/user_confirm [put]
 func (app *Application) UserConfirm(c *gin.Context) {
@@ -243,10 +220,7 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("уведомление не найдено"))
 		return
 	}
-	if notification.Status != ds.StatusDraft  {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя сформировать уведомление со статусом %s", notification.Status))
-		return
-	}
+	
 	if err := sendingRequest(notification.UUID); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf(`sending service is unavailable: {%s}`, err))
 		return
@@ -268,10 +242,10 @@ func (app *Application) UserConfirm(c *gin.Context) {
 // @Summary		Подтвердить уведомление
 // @Tags		Уведомления
 // @Description	Подтвердить или отменить уведомление модератором
-// @Param		notification_id path string true "id уведомления"
+// @Param		id path string true "id уведомления"
 // @Param		confirm body boolean true "подтвердить"
-// @Success		200
-// @Router		/api/notifications/{notification_id}/moderator_confirm [put]
+// @Success		200 {object} schemes.NotificationOutput
+// @Router		/api/notifications/{id}/moderator_confirm [put]
 func (app *Application) ModeratorConfirm(c *gin.Context) {
 	var request schemes.ModeratorConfirmRequest
 	if err := c.ShouldBindUri(&request.URI); err != nil {
@@ -307,13 +281,18 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 	} else {
 		notification.Status = ds.StatusRejected
 	}
-	notification.ModeratorId = &userId
+	moderator, err := app.repo.GetUserById(userId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	notification.Moderator = moderator
 	
 	if err := app.repo.SaveNotification(notification); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, schemes.ConvertNotification(notification))
 }
 
 func (app *Application) Sending(c *gin.Context) {
@@ -326,7 +305,7 @@ func (app *Application) Sending(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	fmt.Println(request, app.config.Token)
+	
 
 	if request.Token != app.config.Token {
 		c.AbortWithStatus(http.StatusForbidden)
