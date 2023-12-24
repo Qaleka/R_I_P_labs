@@ -8,7 +8,7 @@ BucketName = "images"
 
 [jwt]
 Token = "peppa"
-ExpiresIn = "1h"
+ExpiresIn = "24h"
 
 [Redis]
 DialTimeout = "10s"

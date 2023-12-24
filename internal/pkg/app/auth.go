@@ -22,7 +22,7 @@ import (
 // @Accept		json
 // @Produce		json
 // @Param		user_credentials body schemes.RegisterReq true "login and password"
-// @Success		200 {object} schemes.RegisterResp
+// @Success		200 {object} schemes.SwaggerLoginResp
 // @Router		/api/user/sign_up [post]
 func (app *Application) Register(c *gin.Context) {
 	request := &schemes.RegisterReq{}
@@ -41,17 +41,52 @@ func (app *Application) Register(c *gin.Context) {
 		return
 	}
 
-	if err := app.repo.AddUser(&ds.User{
+	existing_user, err := app.repo.GetUserByLogin(request.Login)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	if existing_user != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	user := ds.User{
 		Role:     role.Customer,
 		Login:    request.Login,
 		Password: generateHashString(request.Password),
-	}); err != nil {
+	}
+	if err := app.repo.AddUser(&user); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, &schemes.RegisterResp{
-		Ok: true,
+	JWTConfig := app.config.JWT
+	token := jwt.NewWithClaims(JWTConfig.SigningMethod, &ds.JWTClaims{
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(JWTConfig.ExpiresIn).Unix(),
+			IssuedAt:  time.Now().Unix(),
+			Issuer:    "bitop-admin",
+		},
+		UserUUID: user.UUID,
+		Role:     user.Role,
+	})
+	if token == nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("token is nil"))
+		return
+	}
+
+	strToken, err := token.SignedString([]byte(JWTConfig.Token))
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("cant create str token"))
+		return
+	}
+
+	c.JSON(http.StatusOK, schemes.AuthResp{
+		ExpiresIn:   JWTConfig.ExpiresIn,
+		AccessToken: strToken,
+		Role:        user.Role,
+		TokenType:   "Bearer",
 	})
 }
 
@@ -104,9 +139,10 @@ func (app *Application) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.LoginResp{
+	c.JSON(http.StatusOK, schemes.AuthResp{
 		ExpiresIn:   JWTConfig.ExpiresIn,
 		AccessToken: strToken,
+		Role:        user.Role,
 		TokenType:   "Bearer",
 	})
 }

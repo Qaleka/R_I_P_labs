@@ -2,6 +2,7 @@ package schemes
 
 import (
 	"R_I_P_labs/internal/app/ds"
+	"R_I_P_labs/internal/app/role"
 	"time"
 	"fmt"
 )
@@ -78,18 +79,17 @@ type AddToNotificationResp struct {
 	RecipientsCount int64 `json:"recipient_count"`
 }
 
-type LoginResp struct {
+type AuthResp struct {
 	ExpiresIn   time.Duration `json:"expires_in"`
 	AccessToken string        `json:"access_token"`
+	Role        role.Role     `json:"role"`
 	TokenType   string        `json:"token_type"`
 }
 
 type SwaggerLoginResp struct {
 	ExpiresIn   int64  `json:"expires_in"`
 	AccessToken string `json:"access_token"`
+	Role        int    `json:"role"`
 	TokenType   string `json:"token_type"`
 }
 
-type RegisterResp struct {
-	Ok bool `json:"ok"`
-}
