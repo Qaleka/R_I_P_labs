@@ -13,7 +13,7 @@ type AllRecipientsResponse struct {
 
 type NotificationShort struct {
 	UUID           string `json:"uuid"`
-	RecipientCount int    `json:"recipient_count"`
+	RecipientCount int64    `json:"recipient_count"`
 }
 
 type GetAllRecipientsResponse struct {
@@ -50,19 +50,19 @@ func ConvertNotification(notification *ds.Notification) NotificationOutput {
 	output := NotificationOutput{
 		UUID:         notification.UUID,
 		Status:       notification.Status,
-		CreationDate: notification.CreationDate.Format("2006-01-02 15:04:05"),
+		CreationDate: notification.CreationDate.Format("2006-01-02T15:04:05Z07:00"),
 		NotificationType:    notification.NotificationType,
 		SendingStatus: notification.SendingStatus,
 		Customer:     notification.Customer.Login,
 	}
 
 	if notification.FormationDate != nil {
-		formationDate := notification.FormationDate.Format("2006-01-02 15:04:05")
+		formationDate := notification.FormationDate.Format("2006-01-02T15:04:05Z07:00")
 		output.FormationDate = &formationDate
 	}
 
 	if notification.CompletionDate != nil {
-		completionDate := notification.CompletionDate.Format("2006-01-02 15:04:05")
+		completionDate := notification.CompletionDate.Format("2006-01-02T15:04:05Z07:00")
 		output.CompletionDate = &completionDate
 	}
 
@@ -83,6 +83,7 @@ type AuthResp struct {
 	ExpiresIn   time.Duration `json:"expires_in"`
 	AccessToken string        `json:"access_token"`
 	Role        role.Role     `json:"role"`
+	Login       string        `json:"login"`
 	TokenType   string        `json:"token_type"`
 }
 
@@ -90,6 +91,7 @@ type SwaggerLoginResp struct {
 	ExpiresIn   int64  `json:"expires_in"`
 	AccessToken string `json:"access_token"`
 	Role        int    `json:"role"`
+	Login       string `json:"login"`
 	TokenType   string `json:"token_type"`
 }
 

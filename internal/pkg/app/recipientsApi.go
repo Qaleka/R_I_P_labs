@@ -47,7 +47,7 @@ func (app *Application) GetAllRecipients(c *gin.Context) {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		response.DraftNotification.RecipientCount = int(recipientsCount)
+		response.DraftNotification.RecipientCount = recipientsCount
 	}
 	c.JSON(http.StatusOK, response)
 }
@@ -225,7 +225,7 @@ func (app *Application) ChangeRecipient(c *gin.Context) {
 // @Description	Добавить выбранного получателя в черновик уведомления
 // @Produce		json
 // @Param		id path string true "id получателя"
-// @Success		200 {object} schemes.AddToNotificationResp
+// @Success		200 {object} schemes.NotificationShort
 // @Router		/api/recipients/{id}/add_to_notification [post]
 func (app *Application) AddToNotification(c *gin.Context) {
 	var request schemes.AddToNotificationRequest
@@ -271,5 +271,5 @@ func (app *Application) AddToNotification(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.AddToNotificationResp{RecipientsCount: recipientsCount})
+	c.JSON(http.StatusOK, schemes.NotificationShort{UUID: notification.UUID, RecipientCount: recipientsCount})
 }
