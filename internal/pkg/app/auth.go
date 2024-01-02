@@ -20,24 +20,13 @@ import (
 // @Tags		Авторизация
 // @Description	Регистрация нового пользователя
 // @Accept		json
-// @Produce		json
 // @Param		user_credentials body schemes.RegisterReq true "login and password"
-// @Success		200 {object} schemes.SwaggerLoginResp
+// @Success		200
 // @Router		/api/user/sign_up [post]
 func (app *Application) Register(c *gin.Context) {
 	request := &schemes.RegisterReq{}
 	if err := c.ShouldBind(request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	if request.Password == "" {
-		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("password is empty"))
-		return
-	}
-
-	if request.Login == "" {
-		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("login is empty"))
 		return
 	}
 
@@ -61,34 +50,7 @@ func (app *Application) Register(c *gin.Context) {
 		return
 	}
 
-	JWTConfig := app.config.JWT
-	token := jwt.NewWithClaims(JWTConfig.SigningMethod, &ds.JWTClaims{
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(JWTConfig.ExpiresIn).Unix(),
-			IssuedAt:  time.Now().Unix(),
-			Issuer:    "bitop-admin",
-		},
-		UserUUID: user.UUID,
-		Role:     user.Role,
-	})
-	if token == nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("token is nil"))
-		return
-	}
-
-	strToken, err := token.SignedString([]byte(JWTConfig.Token))
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("cant create str token"))
-		return
-	}
-
-	c.JSON(http.StatusOK, schemes.AuthResp{
-		ExpiresIn:   JWTConfig.ExpiresIn,
-		AccessToken: strToken,
-		Role:        user.Role,
-		Login:       user.Login,
-		TokenType:   "Bearer",
-	})
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Авторизация
@@ -97,7 +59,7 @@ func (app *Application) Register(c *gin.Context) {
 // @Accept		json
 // @Produce		json
 // @Param		user_credentials body schemes.LoginReq true "login and password"
-// @Success		200 {object} schemes.SwaggerLoginResp
+// @Success		200 {object} schemes.AuthResp
 // @Router		/api/user/login [post]
 // @Consumes    json
 func (app *Application) Login(c *gin.Context) {
@@ -124,10 +86,10 @@ func (app *Application) Login(c *gin.Context) {
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(JWTConfig.ExpiresIn).Unix(),
 			IssuedAt:  time.Now().Unix(),
-			Issuer:    "bitop-admin",
 		},
 		UserUUID: user.UUID,
 		Role:	  user.Role,
+		Login:	  user.Login,
 	})
 	if token == nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("token is nil"))
@@ -141,10 +103,7 @@ func (app *Application) Login(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, schemes.AuthResp{
-		ExpiresIn:   JWTConfig.ExpiresIn,
 		AccessToken: strToken,
-		Role:        user.Role,
-		Login:       user.Login,
 		TokenType:   "Bearer",
 	})
 }
@@ -155,7 +114,7 @@ func (app *Application) Login(c *gin.Context) {
 // @Accept		json
 // @Produce		json
 // @Success		200
-// @Router		/api/user/loguot [post]
+// @Router		/api/user/loguot [get]
 func (app *Application) Logout(c *gin.Context) {
 	jwtStr := c.GetHeader("Authorization")
 	if !strings.HasPrefix(jwtStr, jwtPrefix) {

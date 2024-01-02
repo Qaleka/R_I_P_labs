@@ -54,7 +54,7 @@ func (app *Application) Run() {
 		{
 			n.GET("/", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllNotifications)                                         				  // Список (отфильтровать по дате формирования и статусу)
 			n.GET("/:id",app.WithAuthCheck(role.Customer, role.Moderator),  app.GetNotification)                             				  // Одна заявка
-			n.PUT("", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateNotification)                                	  // Изменение (добавление транспорта)
+			n.PUT("", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateNotification)                                	  // Изменение (добавление типа)
 			n.DELETE("", app.WithAuthCheck(role.Customer,role.Moderator), app.DeleteNotification)                                      				  // Удаление
 			n.DELETE("/delete_recipient/:id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromNotification) 	  // Изменеие (удаление услуг)
 			n.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                                    				  // Сформировать создателем
@@ -67,7 +67,7 @@ func (app *Application) Run() {
 		{
 			u.POST("/sign_up", app.Register)
 			u.POST("/login", app.Login)
-			u.POST("/logout", app.Logout)
+			u.GET("/logout", app.Logout)
 		}
 
 		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

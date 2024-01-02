@@ -101,7 +101,7 @@ type SwaggerUpdateNotificationRequest struct {
 // @Access		json
 // @Produce		json
 // @Param		notification_type body SwaggerUpdateNotificationRequest true "Тип уведомления"
-// @Success		200 {object} schemes.NotificationOutput
+// @Success		200
 // @Router		/api/notifications [put]
 func (app *Application) UpdateNotification(c *gin.Context) {
 	var request schemes.UpdateNotificationRequest
@@ -131,7 +131,7 @@ func (app *Application) UpdateNotification(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.ConvertNotification(notification))
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Удалить черновое уведомление
@@ -168,7 +168,7 @@ func (app *Application) DeleteNotification(c *gin.Context) {
 // @Description	Удалить получателя из черновово уведомления
 // @Produce		json
 // @Param		id path string true "id получателя"
-// @Success		200 {object} schemes.AllRecipientsResponse
+// @Success		200
 // @Router		/api/notifications/delete_recipient/{id} [delete]
 func (app *Application) DeleteFromNotification(c *gin.Context) {
 	var request schemes.DeleteFromNotificationRequest
@@ -195,19 +195,13 @@ func (app *Application) DeleteFromNotification(c *gin.Context) {
 		return
 	}
 
-	recipients, err := app.repo.GetNotificationContent(notification.UUID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, schemes.AllRecipientsResponse{Recipients: recipients})
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Сформировать уведомление
 // @Tags		Уведомления
 // @Description	Сформировать уведомление пользователем
-// @Success		200 {object} schemes.NotificationOutput
+// @Success		200
 // @Router		/api/notifications/user_confirm [put]
 func (app *Application) UserConfirm(c *gin.Context) {
 	userId := getUserId(c)
@@ -236,7 +230,8 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, schemes.ConvertNotification(notification))
+	
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Подтвердить уведомление

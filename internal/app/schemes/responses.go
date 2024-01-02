@@ -2,8 +2,6 @@ package schemes
 
 import (
 	"R_I_P_labs/internal/app/ds"
-	"R_I_P_labs/internal/app/role"
-	"time"
 	"fmt"
 )
 
@@ -11,14 +9,9 @@ type AllRecipientsResponse struct {
 	Recipients []ds.Recipient `json:"recipients"`
 }
 
-type NotificationShort struct {
-	UUID           string `json:"uuid"`
-	RecipientCount int64    `json:"recipient_count"`
-}
-
 type GetAllRecipientsResponse struct {
-	DraftNotification *NotificationShort         `json:"draft_notification"`
-	Recipients            []ds.Recipient `json:"recipients"`
+	DraftNotification *string         `json:"draft_notification"`
+	Recipients        []ds.Recipient  `json:"recipients"`
 }
 
 type AllNotificationsResponse struct {
@@ -80,18 +73,7 @@ type AddToNotificationResp struct {
 }
 
 type AuthResp struct {
-	ExpiresIn   time.Duration `json:"expires_in"`
-	AccessToken string        `json:"access_token"`
-	Role        role.Role     `json:"role"`
-	Login       string        `json:"login"`
-	TokenType   string        `json:"token_type"`
-}
-
-type SwaggerLoginResp struct {
-	ExpiresIn   int64  `json:"expires_in"`
 	AccessToken string `json:"access_token"`
-	Role        int    `json:"role"`
-	Login       string `json:"login"`
 	TokenType   string `json:"token_type"`
 }
 
