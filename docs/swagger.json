@@ -49,11 +49,75 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "description": "Позволяет изменить тип чернового уведомления и возвращает обновлённые данные",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Уведомления"
+                ],
+                "summary": "Указать тип уведомления",
+                "parameters": [
+                    {
+                        "description": "Тип уведомления",
+                        "name": "notification_type",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.SwaggerUpdateNotificationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Удаляет черновое уведомление",
+                "tags": [
+                    "Уведомления"
+                ],
+                "summary": "Удалить черновое уведомление",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/notifications/delete_recipient/{id}": {
+            "delete": {
+                "description": "Удалить получателя из черновово уведомления",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Уведомления"
+                ],
+                "summary": "Удалить получателя из черновово уведомления",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id получателя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
             }
         },
         "/api/notifications/user_confirm": {
             "put": {
-                "description": "Сформировать или удалить уведомление пользователем",
+                "description": "Сформировать уведомление пользователем",
                 "tags": [
                     "Уведомления"
                 ],
@@ -65,7 +129,7 @@
                 }
             }
         },
-        "/api/notifications/{notification_id}": {
+        "/api/notifications/{id}": {
             "get": {
                 "description": "Возвращает подробную информацию об уведомлении и его типе",
                 "produces": [
@@ -79,7 +143,7 @@
                     {
                         "type": "string",
                         "description": "id уведомления",
-                        "name": "notification_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -92,102 +156,9 @@
                         }
                     }
                 }
-            },
-            "put": {
-                "description": "Позволяет изменить тип уведомления и возвращает обновлённые данные",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Уведомления"
-                ],
-                "summary": "Указать тип уведомления",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id уведомления",
-                        "name": "notification_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Тип уведомления",
-                        "name": "notification_type",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/app.SwaggerUpdateNotificationRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.UpdateNotificationResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Удаляет уведомление по id",
-                "tags": [
-                    "Уведомления"
-                ],
-                "summary": "Удалить уведомление",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id уведомления",
-                        "name": "notification_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
             }
         },
-        "/api/notifications/{notification_id}/delete_recipient/{recipient_id}": {
-            "delete": {
-                "description": "Удалить получателя из уведомления",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Уведомления"
-                ],
-                "summary": "Удалить получателя из уведомления",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id уведомления",
-                        "name": "notification_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "id получателя",
-                        "name": "recipient_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.AllRecipientsResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/notifications/{notification_id}/moderator_confirm": {
+        "/api/notifications/{id}/moderator_confirm": {
             "put": {
                 "description": "Подтвердить или отменить уведомление модератором",
                 "tags": [
@@ -198,7 +169,7 @@
                     {
                         "type": "string",
                         "description": "id уведомления",
-                        "name": "notification_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -214,7 +185,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.NotificationOutput"
+                        }
                     }
                 }
             }
@@ -245,9 +219,7 @@
                         }
                     }
                 }
-            }
-        },
-        "/api/recipients/": {
+            },
             "post": {
                 "description": "Добавить нового получателя",
                 "consumes": [
@@ -300,7 +272,7 @@
                 }
             }
         },
-        "/api/recipients/{recipient_id}": {
+        "/api/recipients/{id}": {
             "get": {
                 "description": "Возвращает более подробную информацию об одном получателе",
                 "produces": [
@@ -314,7 +286,7 @@
                     {
                         "type": "string",
                         "description": "id получателя",
-                        "name": "recipient_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -344,7 +316,7 @@
                     {
                         "type": "string",
                         "description": "Идентификатор получателя",
-                        "name": "recipient_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -391,7 +363,7 @@
                     {
                         "type": "string",
                         "description": "id получателя",
-                        "name": "recipient_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -403,7 +375,7 @@
                 }
             }
         },
-        "/api/recipients/{recipient_id}/add_to_notification": {
+        "/api/recipients/{id}/add_to_notification": {
             "post": {
                 "description": "Добавить выбранного получателя в черновик уведомления",
                 "produces": [
@@ -417,17 +389,14 @@
                     {
                         "type": "string",
                         "description": "id получателя",
-                        "name": "recipient_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.AddToNotificationResp"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -460,14 +429,14 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemes.SwaggerLoginResp"
+                            "$ref": "#/definitions/schemes.AuthResp"
                         }
                     }
                 }
             }
         },
         "/api/user/loguot": {
-            "post": {
+            "get": {
                 "description": "Выход из аккаунта",
                 "consumes": [
                     "application/json"
@@ -492,9 +461,6 @@
                 "consumes": [
                     "application/json"
                 ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Авторизация"
                 ],
@@ -512,10 +478,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.RegisterResp"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -559,14 +522,6 @@
                 }
             }
         },
-        "schemes.AddToNotificationResp": {
-            "type": "object",
-            "properties": {
-                "recipient_count": {
-                    "type": "integer"
-                }
-            }
-        },
         "schemes.AllNotificationsResponse": {
             "type": "object",
             "properties": {
@@ -578,14 +533,14 @@
                 }
             }
         },
-        "schemes.AllRecipientsResponse": {
+        "schemes.AuthResp": {
             "type": "object",
             "properties": {
-                "recipients": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ds.Recipient"
-                    }
+                "access_token": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string"
                 }
             }
         },
@@ -593,7 +548,7 @@
             "type": "object",
             "properties": {
                 "draft_notification": {
-                    "$ref": "#/definitions/schemes.NotificationShort"
+                    "type": "string"
                 },
                 "recipients": {
                     "type": "array",
@@ -641,6 +596,9 @@
                 "notification_type": {
                     "type": "string"
                 },
+                "sending_status": {
+                    "type": "string"
+                },
                 "status": {
                     "type": "string"
                 },
@@ -663,17 +621,6 @@
                 }
             }
         },
-        "schemes.NotificationShort": {
-            "type": "object",
-            "properties": {
-                "recipient_count": {
-                    "type": "integer"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
         "schemes.RegisterReq": {
             "type": "object",
             "required": [
@@ -688,36 +635,6 @@
                 "password": {
                     "type": "string",
                     "maxLength": 30
-                }
-            }
-        },
-        "schemes.RegisterResp": {
-            "type": "object",
-            "properties": {
-                "ok": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "schemes.SwaggerLoginResp": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "expires_in": {
-                    "type": "integer"
-                },
-                "token_type": {
-                    "type": "string"
-                }
-            }
-        },
-        "schemes.UpdateNotificationResponse": {
-            "type": "object",
-            "properties": {
-                "notifications": {
-                    "$ref": "#/definitions/schemes.NotificationOutput"
                 }
             }
         }

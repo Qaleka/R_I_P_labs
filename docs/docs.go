@@ -53,11 +53,75 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "put": {
+                "description": "Позволяет изменить тип чернового уведомления и возвращает обновлённые данные",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Уведомления"
+                ],
+                "summary": "Указать тип уведомления",
+                "parameters": [
+                    {
+                        "description": "Тип уведомления",
+                        "name": "notification_type",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.SwaggerUpdateNotificationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Удаляет черновое уведомление",
+                "tags": [
+                    "Уведомления"
+                ],
+                "summary": "Удалить черновое уведомление",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/notifications/delete_recipient/{id}": {
+            "delete": {
+                "description": "Удалить получателя из черновово уведомления",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Уведомления"
+                ],
+                "summary": "Удалить получателя из черновово уведомления",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id получателя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
             }
         },
         "/api/notifications/user_confirm": {
             "put": {
-                "description": "Сформировать или удалить уведомление пользователем",
+                "description": "Сформировать уведомление пользователем",
                 "tags": [
                     "Уведомления"
                 ],
@@ -69,7 +133,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/notifications/{notification_id}": {
+        "/api/notifications/{id}": {
             "get": {
                 "description": "Возвращает подробную информацию об уведомлении и его типе",
                 "produces": [
@@ -83,7 +147,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "id уведомления",
-                        "name": "notification_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -96,102 +160,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "put": {
-                "description": "Позволяет изменить тип уведомления и возвращает обновлённые данные",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Уведомления"
-                ],
-                "summary": "Указать тип уведомления",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id уведомления",
-                        "name": "notification_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Тип уведомления",
-                        "name": "notification_type",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/app.SwaggerUpdateNotificationRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.UpdateNotificationResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Удаляет уведомление по id",
-                "tags": [
-                    "Уведомления"
-                ],
-                "summary": "Удалить уведомление",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id уведомления",
-                        "name": "notification_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
             }
         },
-        "/api/notifications/{notification_id}/delete_recipient/{recipient_id}": {
-            "delete": {
-                "description": "Удалить получателя из уведомления",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Уведомления"
-                ],
-                "summary": "Удалить получателя из уведомления",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id уведомления",
-                        "name": "notification_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "id получателя",
-                        "name": "recipient_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.AllRecipientsResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/notifications/{notification_id}/moderator_confirm": {
+        "/api/notifications/{id}/moderator_confirm": {
             "put": {
                 "description": "Подтвердить или отменить уведомление модератором",
                 "tags": [
@@ -202,7 +173,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "id уведомления",
-                        "name": "notification_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -218,7 +189,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.NotificationOutput"
+                        }
                     }
                 }
             }
@@ -249,9 +223,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/api/recipients/": {
+            },
             "post": {
                 "description": "Добавить нового получателя",
                 "consumes": [
@@ -304,7 +276,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/recipients/{recipient_id}": {
+        "/api/recipients/{id}": {
             "get": {
                 "description": "Возвращает более подробную информацию об одном получателе",
                 "produces": [
@@ -318,7 +290,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "id получателя",
-                        "name": "recipient_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -348,7 +320,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Идентификатор получателя",
-                        "name": "recipient_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -395,7 +367,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "id получателя",
-                        "name": "recipient_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -407,7 +379,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/recipients/{recipient_id}/add_to_notification": {
+        "/api/recipients/{id}/add_to_notification": {
             "post": {
                 "description": "Добавить выбранного получателя в черновик уведомления",
                 "produces": [
@@ -421,17 +393,14 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "id получателя",
-                        "name": "recipient_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.AddToNotificationResp"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -464,14 +433,14 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemes.SwaggerLoginResp"
+                            "$ref": "#/definitions/schemes.AuthResp"
                         }
                     }
                 }
             }
         },
         "/api/user/loguot": {
-            "post": {
+            "get": {
                 "description": "Выход из аккаунта",
                 "consumes": [
                     "application/json"
@@ -496,9 +465,6 @@ const docTemplate = `{
                 "consumes": [
                     "application/json"
                 ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Авторизация"
                 ],
@@ -516,10 +482,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.RegisterResp"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -563,14 +526,6 @@ const docTemplate = `{
                 }
             }
         },
-        "schemes.AddToNotificationResp": {
-            "type": "object",
-            "properties": {
-                "recipient_count": {
-                    "type": "integer"
-                }
-            }
-        },
         "schemes.AllNotificationsResponse": {
             "type": "object",
             "properties": {
@@ -582,14 +537,14 @@ const docTemplate = `{
                 }
             }
         },
-        "schemes.AllRecipientsResponse": {
+        "schemes.AuthResp": {
             "type": "object",
             "properties": {
-                "recipients": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ds.Recipient"
-                    }
+                "access_token": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string"
                 }
             }
         },
@@ -597,7 +552,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "draft_notification": {
-                    "$ref": "#/definitions/schemes.NotificationShort"
+                    "type": "string"
                 },
                 "recipients": {
                     "type": "array",
@@ -645,6 +600,9 @@ const docTemplate = `{
                 "notification_type": {
                     "type": "string"
                 },
+                "sending_status": {
+                    "type": "string"
+                },
                 "status": {
                     "type": "string"
                 },
@@ -667,17 +625,6 @@ const docTemplate = `{
                 }
             }
         },
-        "schemes.NotificationShort": {
-            "type": "object",
-            "properties": {
-                "recipient_count": {
-                    "type": "integer"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
         "schemes.RegisterReq": {
             "type": "object",
             "required": [
@@ -692,36 +639,6 @@ const docTemplate = `{
                 "password": {
                     "type": "string",
                     "maxLength": 30
-                }
-            }
-        },
-        "schemes.RegisterResp": {
-            "type": "object",
-            "properties": {
-                "ok": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "schemes.SwaggerLoginResp": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "expires_in": {
-                    "type": "integer"
-                },
-                "token_type": {
-                    "type": "string"
-                }
-            }
-        },
-        "schemes.UpdateNotificationResponse": {
-            "type": "object",
-            "properties": {
-                "notifications": {
-                    "$ref": "#/definitions/schemes.NotificationOutput"
                 }
             }
         }

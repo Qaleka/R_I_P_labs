@@ -25,11 +25,6 @@ definitions:
     - email
     - fio
     type: object
-  schemes.AddToNotificationResp:
-    properties:
-      recipient_count:
-        type: integer
-    type: object
   schemes.AllNotificationsResponse:
     properties:
       notifications:
@@ -37,17 +32,17 @@ definitions:
           $ref: '#/definitions/schemes.NotificationOutput'
         type: array
     type: object
-  schemes.AllRecipientsResponse:
+  schemes.AuthResp:
     properties:
-      recipients:
-        items:
-          $ref: '#/definitions/ds.Recipient'
-        type: array
+      access_token:
+        type: string
+      token_type:
+        type: string
     type: object
   schemes.GetAllRecipientsResponse:
     properties:
       draft_notification:
-        $ref: '#/definitions/schemes.NotificationShort'
+        type: string
       recipients:
         items:
           $ref: '#/definitions/ds.Recipient'
@@ -79,6 +74,8 @@ definitions:
         type: string
       notification_type:
         type: string
+      sending_status:
+        type: string
       status:
         type: string
       uuid:
@@ -93,13 +90,6 @@ definitions:
           $ref: '#/definitions/ds.Recipient'
         type: array
     type: object
-  schemes.NotificationShort:
-    properties:
-      recipient_count:
-        type: integer
-      uuid:
-        type: string
-    type: object
   schemes.RegisterReq:
     properties:
       login:
@@ -112,25 +102,6 @@ definitions:
     - login
     - password
     type: object
-  schemes.RegisterResp:
-    properties:
-      ok:
-        type: boolean
-    type: object
-  schemes.SwaggerLoginResp:
-    properties:
-      access_token:
-        type: string
-      expires_in:
-        type: integer
-      token_type:
-        type: string
-    type: object
-  schemes.UpdateNotificationResponse:
-    properties:
-      notifications:
-        $ref: '#/definitions/schemes.NotificationOutput'
-    type: object
 host: 127.0.0.1:80
 info:
   contact: {}
@@ -138,6 +109,14 @@ info:
   version: "1.0"
 paths:
   /api/notifications:
+    delete:
+      description: Удаляет черновое уведомление
+      responses:
+        "200":
+          description: OK
+      summary: Удалить черновое уведомление
+      tags:
+      - Уведомления
     get:
       description: Возвращает все уведомления с фильтрацией по статусу и дате формирования
       parameters:
@@ -163,27 +142,31 @@ paths:
       summary: Получить все уведомления
       tags:
       - Уведомления
-  /api/notifications/{notification_id}:
-    delete:
-      description: Удаляет уведомление по id
+    put:
+      description: Позволяет изменить тип чернового уведомления и возвращает обновлённые
+        данные
       parameters:
-      - description: id уведомления
-        in: path
-        name: notification_id
+      - description: Тип уведомления
+        in: body
+        name: notification_type
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/app.SwaggerUpdateNotificationRequest'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
-      summary: Удалить уведомление
+      summary: Указать тип уведомления
       tags:
       - Уведомления
+  /api/notifications/{id}:
     get:
       description: Возвращает подробную информацию об уведомлении и его типе
       parameters:
       - description: id уведомления
         in: path
-        name: notification_id
+        name: id
         required: true
         type: string
       produces:
@@ -196,61 +179,13 @@ paths:
       summary: Получить одно уведомление
       tags:
       - Уведомления
-    put:
-      description: Позволяет изменить тип уведомления и возвращает обновлённые данные
-      parameters:
-      - description: id уведомления
-        in: path
-        name: notification_id
-        required: true
-        type: string
-      - description: Тип уведомления
-        in: body
-        name: notification_type
-        required: true
-        schema:
-          $ref: '#/definitions/app.SwaggerUpdateNotificationRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/schemes.UpdateNotificationResponse'
-      summary: Указать тип уведомления
-      tags:
-      - Уведомления
-  /api/notifications/{notification_id}/delete_recipient/{recipient_id}:
-    delete:
-      description: Удалить получателя из уведомления
-      parameters:
-      - description: id уведомления
-        in: path
-        name: notification_id
-        required: true
-        type: string
-      - description: id получателя
-        in: path
-        name: recipient_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/schemes.AllRecipientsResponse'
-      summary: Удалить получателя из уведомления
-      tags:
-      - Уведомления
-  /api/notifications/{notification_id}/moderator_confirm:
+  /api/notifications/{id}/moderator_confirm:
     put:
       description: Подтвердить или отменить уведомление модератором
       parameters:
       - description: id уведомления
         in: path
-        name: notification_id
+        name: id
         required: true
         type: string
       - description: подтвердить
@@ -262,12 +197,31 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/schemes.NotificationOutput'
       summary: Подтвердить уведомление
+      tags:
+      - Уведомления
+  /api/notifications/delete_recipient/{id}:
+    delete:
+      description: Удалить получателя из черновово уведомления
+      parameters:
+      - description: id получателя
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Удалить получателя из черновово уведомления
       tags:
       - Уведомления
   /api/notifications/user_confirm:
     put:
-      description: Сформировать или удалить уведомление пользователем
+      description: Сформировать уведомление пользователем
       responses:
         "200":
           description: OK
@@ -293,7 +247,6 @@ paths:
       summary: Получить всех получателей
       tags:
       - Получатели
-  /api/recipients/:
     post:
       consumes:
       - multipart/form-data
@@ -329,13 +282,13 @@ paths:
       summary: Добавить получателя
       tags:
       - Получатели
-  /api/recipients/{recipient_id}:
+  /api/recipients/{id}:
     delete:
       description: Удаляет получателя по id
       parameters:
       - description: id получателя
         in: path
-        name: recipient_id
+        name: id
         required: true
         type: string
       responses:
@@ -349,7 +302,7 @@ paths:
       parameters:
       - description: id получателя
         in: path
-        name: recipient_id
+        name: id
         required: true
         type: string
       produces:
@@ -369,7 +322,7 @@ paths:
       parameters:
       - description: Идентификатор получателя
         in: path
-        name: recipient_id
+        name: id
         required: true
         type: string
       - description: ФИО
@@ -398,13 +351,13 @@ paths:
       summary: Изменить получателя
       tags:
       - Получатели
-  /api/recipients/{recipient_id}/add_to_notification:
+  /api/recipients/{id}/add_to_notification:
     post:
       description: Добавить выбранного получателя в черновик уведомления
       parameters:
       - description: id получателя
         in: path
-        name: recipient_id
+        name: id
         required: true
         type: string
       produces:
@@ -412,8 +365,6 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/schemes.AddToNotificationResp'
       summary: Добавить в уведомление
       tags:
       - Получатели
@@ -436,12 +387,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schemes.SwaggerLoginResp'
+            $ref: '#/definitions/schemes.AuthResp'
       summary: Авторизация
       tags:
       - Авторизация
   /api/user/loguot:
-    post:
+    get:
       consumes:
       - application/json
       description: Выход из аккаунта
@@ -465,13 +416,9 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/schemes.RegisterReq'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/schemes.RegisterResp'
       summary: Регистрация
       tags:
       - Авторизация
