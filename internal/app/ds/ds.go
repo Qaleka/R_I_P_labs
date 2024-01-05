@@ -11,9 +11,6 @@ const StatusCompleted string = "завершён"
 const StatusRejected string = "отклонён"
 const StatusDeleted string = "удалён"
 
-const SendingCompleted string = "отправлено"
-const SendingFailed string = "отправка отменена"
-const SendingStarted string = "отправка начата"
 
 type User struct {
 	UUID     string `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"-"`
@@ -42,7 +39,6 @@ type Notification struct {
 	ModeratorId      *string    `json:"-"`
 	CustomerId       string     `gorm:"not null"`
 	NotificationType *string     `gorm:"size:50"`
-	SendingStatus *string    `gorm:"size:40"`
 
 	Moderator *User
 	Customer  User
