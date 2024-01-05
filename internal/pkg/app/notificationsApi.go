@@ -239,7 +239,7 @@ func (app *Application) UserConfirm(c *gin.Context) {
 // @Description	Подтвердить или отменить уведомление модератором
 // @Param		id path string true "id уведомления"
 // @Param		confirm body boolean true "подтвердить"
-// @Success		200 {object} schemes.NotificationOutput
+// @Success		200
 // @Router		/api/notifications/{id}/moderator_confirm [put]
 func (app *Application) ModeratorConfirm(c *gin.Context) {
 	var request schemes.ModeratorConfirmRequest
@@ -287,7 +287,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, schemes.ConvertNotification(notification))
+	c.Status(http.StatusOK)
 }
 
 func (app *Application) Sending(c *gin.Context) {

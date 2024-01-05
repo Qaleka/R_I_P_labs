@@ -149,13 +149,13 @@ func (app *Application) AddRecipient(c *gin.Context) {
 // @Tags		Получатели
 // @Description	Изменить данные полей о получателе
 // @Accept		mpfd
-// @Produce		json
 // @Param		id path string true "Идентификатор получателя" format:"uuid"
 // @Param		fio formData string false "ФИО" format:"string" maxLength:100
 // @Param		email formData string false "Почта" format:"string" maxLength:100
 // @Param		age formData int false "Возраст" format:"int"
 // @Param		image formData file false "Изображение получателя"
 // @Param		adress formData string false "Адрес" format:"string" maxLength:100
+// @Success		200
 // @Router		/api/recipients/{id} [put]
 func (app *Application) ChangeRecipient(c *gin.Context) {
 	var request schemes.ChangeRecipientRequest
@@ -210,7 +210,7 @@ func (app *Application) ChangeRecipient(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, recipient)
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Добавить в уведомление
