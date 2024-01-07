@@ -93,15 +93,18 @@ func (app *Application) DeleteRecipient(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("получатель не найден"))
 		return
 	}
-	recipient.ImageURL = nil
-	recipient.IsDeleted = true
 	if recipient.ImageURL != nil {
 		if err := app.deleteImage(c, recipient.UUID); err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 	}
-
+	recipient.ImageURL = nil
+	recipient.IsDeleted = true
+	if err := app.repo.SaveRecipient(recipient); err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 	c.Status(http.StatusOK)
 }
 
