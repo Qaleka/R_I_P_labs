@@ -1,4 +1,4 @@
-# R_I_P_labs
+# Ссылки на все лабораторные
 **Электронные уведомления.**
 # Бэкенд:
 ## Основной сервис
@@ -18,6 +18,6 @@
 # Мобильное приложение:
 - [React Native (лаб 7)](https://github.com/Qaleka/R_I_P_labs_mobile)
 
-# Домашнее задание:
+# ДЗ:
 - [Интерфес модератора](https://github.com/Qaleka/R_I_P_labs_front/tree/moderator_interface)
 - [РПЗ](https://github.com/Qaleka/R_I_P_labs_front/blob/moderator_interface/ИУ5-53Б%20Балюк%20РПЗ.docx)
