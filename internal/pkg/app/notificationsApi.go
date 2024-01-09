@@ -32,7 +32,6 @@ func (app *Application) GetAllNotifications(c *gin.Context) {
 
 	userId := getUserId(c)
 	userRole := getUserRole(c)
-	fmt.Println(userId, userRole)
 	var notifications []ds.Notification
 	if userRole == role.Customer {
 		notifications, err = app.repo.GetAllNotifications(&userId, request.FormationDateStart, request.FormationDateEnd, request.Status)
@@ -270,12 +269,11 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 
 	if *request.Confirm {
 		notification.Status = ds.StatusCompleted
-		now := time.Now()
-		notification.CompletionDate = &now
-	
 	} else {
 		notification.Status = ds.StatusRejected
 	}
+	now := time.Now()
+	notification.CompletionDate = &now
 	moderator, err := app.repo.GetUserById(userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)

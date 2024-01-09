@@ -6,10 +6,10 @@ import (
 )
 
 const StatusDraft string = "черновик"
-const StatusFormed string = "сформирован"
-const StatusCompleted string = "завершён"
-const StatusRejected string = "отклонён"
-const StatusDeleted string = "удалён"
+const StatusFormed string = "сформировано"
+const StatusCompleted string = "завершено"
+const StatusRejected string = "отклонено"
+const StatusDeleted string = "удалено"
 
 const SendingCompleted string = "отправлено"
 const SendingFailed string = "отправка отменена"

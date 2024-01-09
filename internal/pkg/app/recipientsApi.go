@@ -117,7 +117,7 @@ func (app *Application) DeleteRecipient(c *gin.Context) {
 // @Param     	email formData string true "Почта" format:"string" maxLength:100
 // @Param     	age formData int true "Возраст" format:"int"
 // @Param     	adress formData string true "Адрес" format:"string" maxLength:100
-// @Success		200
+// @Success		200 string
 // @Router		/api/recipients [post]
 func (app *Application) AddRecipient(c *gin.Context) {
 	var request schemes.AddRecipientRequest
@@ -145,7 +145,7 @@ func (app *Application) AddRecipient(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusCreated, recipient.UUID)
 }
 
 // @Summary		Изменить получателя
