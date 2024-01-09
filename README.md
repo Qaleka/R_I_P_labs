@@ -1,13 +1,13 @@
 # Ссылки на все лабораторные
 **Электронные уведомления.**
 # Бэкенд:
-## Основной сервис
+## Бэкенд (основной сервис)
 - [SSR (лаб 1)](https://github.com/Qaleka/R_I_P_labs/tree/ssr)
 - [База данных (лаб 2)](https://github.com/Qaleka/R_I_P_labs/tree/db)
 - [Веб-сервис REST-API (лаб 3)](https://github.com/Qaleka/R_I_P_labs/tree/web-service)
 - [Аутентификация и авторизация (лаб 5)](https://github.com/Qaleka/R_I_P_labs/tree/authorization)
 - [Взаимодействие с асинхронным сервисом (лаб 8)](https://github.com/Qaleka/R_I_P_labs/tree/async_service)
-## Асинхронный сервис
+## Асинхронный сервис (отлеживание отправки)
 - [Асинхронный сервис (лаб 8)](https://github.com/Qaleka/R_I_P_labs_async)
 
 # Фронтенд:
