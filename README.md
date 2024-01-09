@@ -1,6 +1,5 @@
 # Ссылки на все лабораторные
 **Электронные уведомления.**
-# Бэкенд:
 ## Бэкенд (основной сервис)
 - [SSR (лаб 1)](https://github.com/Qaleka/R_I_P_labs/tree/ssr)
 - [База данных (лаб 2)](https://github.com/Qaleka/R_I_P_labs/tree/db)
